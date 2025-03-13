@@ -1,0 +1,24 @@
+@import "tailwindcss";
+
+
+:root {
+    --primary-color: #6C5DD3;
+}
+
+#root{
+    font-family: onest;
+}
+
+.bg-primary{
+    background: #6C5DD3;
+}
+
+.text-primary{
+    color: #6C5DD3;
+}
+
+.text-gray{
+    color: #737373;
+}
+
+/* e2e8f0 */
