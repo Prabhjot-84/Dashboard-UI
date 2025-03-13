@@ -1,7 +1,9 @@
 import { Route, Routes } from 'react-router-dom'
 import './App.css'
-import FrontPage from './components/FrontPage' 
+import FirstPage from './components/FirstPage' 
 import SecondPage from './components/SecondPage'
+import ThirdPage from './components/ThirdPage'
+import ForthPage from './components/ForthPage'
 
 function App() {
 
@@ -9,8 +11,10 @@ function App() {
     <>
       {/* Routing */}
       <Routes>
-        <Route path="/" element={<FrontPage />} />
+        <Route path="/" element={<FirstPage />} />
         <Route path="/SecondPage" element={<SecondPage />} />
+        <Route path="/ThirdPage" element={<ThirdPage />} />
+        <Route path="/ForthPage" element={<ForthPage />} />
       </Routes>
     </>
   )

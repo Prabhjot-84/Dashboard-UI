@@ -3,13 +3,13 @@ import LandingImage from '../assets/landing-page.png'
 import Arrow from '../assets/get-started-arrow.png'
 import { Link } from 'react-router-dom'
 
-const FrontPage = () => {
+const FirstPage = () => {
     return (
         <>
             <div className=' bg-slate-200 w-screen h-screen p-4 flex items-center justify-center gap-4'>
 
                 {/* Left Sidebar */}
-                <div className='w-[300px] h-full rounded-2xl bg-primary'> 
+                <div className='w-[300px] h-full rounded-2xl bg-primary'>
 
                 </div>
 
@@ -38,4 +38,4 @@ const FrontPage = () => {
     )
 }
 
-export default FrontPage
+export default FirstPage
