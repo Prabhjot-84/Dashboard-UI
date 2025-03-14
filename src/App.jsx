@@ -1,9 +1,8 @@
 import { Route, Routes } from 'react-router-dom'
 import './App.css'
-import FirstPage from './components/FirstPage' 
-import SecondPage from './components/SecondPage'
-import ThirdPage from './components/ThirdPage'
-import ForthPage from './components/ForthPage'
+import LandingPage from './pages/LandingPage' 
+import SelectGraph from './pages/SelectGraph'
+import SelectPara from './pages/SelectPara'
 
 function App() {
 
@@ -11,10 +10,9 @@ function App() {
     <>
       {/* Routing */}
       <Routes>
-        <Route path="/" element={<FirstPage />} />
-        <Route path="/SecondPage" element={<SecondPage />} />
-        <Route path="/ThirdPage" element={<ThirdPage />} />
-        <Route path="/ForthPage" element={<ForthPage />} />
+        <Route path="/" element={<LandingPage />} />
+        <Route path="/select-graph" element={<SelectGraph />} />
+        <Route path="/select-parameter" element={<SelectPara />} />
       </Routes>
     </>
   )
