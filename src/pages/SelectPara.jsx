@@ -2,12 +2,12 @@ import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom';
 import ParaSidebar from '../components/ParaSidebar'
 import Dropdown from '../components/Dropdown'
-import { Link } from 'react-router-dom'
 import Arrow from '../assets/go-back-arrow.png'
 import Cross from '../assets/cross.png'
 import YaxisImg from '../assets/y-axis.png'
 import XaxisImg from '../assets/x-axis.png'
 import EmptyGraph from '../components/EmptyGraph'
+import PreventRefresh from '../components/PreventRefresh';
 
 const SelectPara = ( {selectedGraph, setSelectedGraph, graphName, setGraphName, Xaxis, setXAxis, Yaxis, setYAxis, Xlabel, setXlabel, Ylabel, setYlabel, filters, setFilters}  ) => {
 
@@ -18,8 +18,23 @@ const SelectPara = ( {selectedGraph, setSelectedGraph, graphName, setGraphName, 
         window.history.back()
     }
 
+    // Handle drop event for X-axis
+    const handleDropXaxis = (e) => {
+        e.preventDefault();
+        const droppedParam = e.dataTransfer.getData("parameter");
+        setXAxis(droppedParam);
+    };
+
+    const handleDropYaxis = (e) => {
+        e.preventDefault();
+        const droppedParam = e.dataTransfer.getData("parameter");
+        setYAxis(droppedParam);
+    }
+
     return (
         <>
+            <PreventRefresh />
+
             <div className=' bg-slate-200 w-screen h-screen p-4 flex items-center justify-center gap-4'>
 
                 {/* Graph Section */}
@@ -76,11 +91,15 @@ const SelectPara = ( {selectedGraph, setSelectedGraph, graphName, setGraphName, 
 
                     <div className='h-[460px] w-full flex items-center justify-center px-5'>
                         
-                        {/* Drop Y-axis parameter */}
-                        <div className='h-full w-24 flex justify-center items-center text-sm'>
-                            <div className='border-4 border-dashed border-[#6C5DD3] rounded rotate-270'>
-                                <div className='w-[300px] flex items-center outline-3 outline-white rounded-xs p-2'>
-                                    <img src={YaxisImg} alt="" /> Drag and Drop you 'Y' parameter here
+                        {/* Drop Zone for Y-axis */}
+                        <div className='h-full w-24 flex justify-center items-center text-sm'
+                            onDragOver={(e) => e.preventDefault()}
+                            onDrop={handleDropYaxis}
+                        >
+                            <div className='border-4 border-dashed border-[#6C5DD3] rounded w-fit inline-block -rotate-90'>
+                                <div className='w-max h-[50px] flex items-center gap-2 outline-3 outline-white rounded-xs p-2'>
+                                    <img src={YaxisImg} alt="" />
+                                    {Yaxis ? `${Yaxis}` : "Drag and Drop you 'Y' parameter here"}
                                 </div>
                             </div>
                         </div>
@@ -90,11 +109,15 @@ const SelectPara = ( {selectedGraph, setSelectedGraph, graphName, setGraphName, 
                             <div className='h-5/6 w-full mt-2.5'>
                                 <EmptyGraph />
                             </div>
-                            {/* Drop X-axis parameter */}
-                            <div className='h-1/6 w-full flex items-center justify-center text-sm'>
+                            {/* Drop Zone for X-axis */}
+                            <div className='h-1/6 w-full flex items-center justify-center text-sm'
+                                onDragOver={(e) => e.preventDefault()}
+                                onDrop={handleDropXaxis}
+                            >
                                 <div className='border-4 border-dashed border-[#6C5DD3] rounded'>
                                     <div className='w-full flex items-center outline-3 outline-white rounded-xs p-2'>
-                                        <img src={XaxisImg} alt="" /> Drag and Drop you 'X' parameter here
+                                        <img src={XaxisImg} alt="" />
+                                        {Xaxis ? `${Xaxis}` : "Drag and Drop your 'X' parameter here"}
                                     </div>
                                 </div>
                             </div>

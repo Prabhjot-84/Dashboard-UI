@@ -7,6 +7,11 @@ const ParaSidebar = ({ graphName, setGraphName, Xaxis, setXAxis, Yaxis, setYAxis
 
     const [showFilters, setShowFilters] = useState(false);
 
+    // Handle drag start (store the parameter being dragged)
+    const handleDragStart = (e, paramName) => {
+        e.dataTransfer.setData("parameter", paramName);
+    };
+
     useEffect(() => {
         if (!showFilters) {
             setFilters([]);
@@ -15,10 +20,14 @@ const ParaSidebar = ({ graphName, setGraphName, Xaxis, setXAxis, Yaxis, setYAxis
 
     const removeXAxis = () => {
         setXAxis(null);
+        setShowFilters(false);
+        setFilters([]);
     }
 
     const removeYAxis = () => {
         setYAxis(null);
+        setShowFilters(false);
+        setFilters([]);
     }
 
     const parameters = [
@@ -63,11 +72,14 @@ const ParaSidebar = ({ graphName, setGraphName, Xaxis, setXAxis, Yaxis, setYAxis
                                 {parameters
                                     .filter(param => param.name !== Xaxis && param.name !== Yaxis)
                                     .map((param, index) => (
-                                        <div key={index} 
-                                            className='text-primary border-2 border-[#e2e8f0] flex items-center gap-4 p-2 rounded-md mb-3 hover:border-[#6C5DD3] hover:cursor-pointer'
+                                        <div
+                                            key={index}
+                                            className="text-primary border-2 border-[#e2e8f0] flex items-center gap-4 p-2 rounded-md mb-3 hover:border-[#6C5DD3] hover:cursor-pointer"
+                                            draggable
+                                            onDragStart={(e) => handleDragStart(e, param.name)}
                                         >
                                             <img src={ParameterImg} alt="parameter-icon" />
-                                            <p> {param.name} </p>
+                                            <p>{param.name}</p>
                                         </div>
                                 ))}
                             </div>
@@ -105,7 +117,7 @@ const ParaSidebar = ({ graphName, setGraphName, Xaxis, setXAxis, Yaxis, setYAxis
                     )}
 
                     {/* Element will only render if Xaxis and Yaxis are not null */}
-                    {(Xaxis || Yaxis) && (
+                    {(Xaxis && Yaxis) && (
                         <div className='flex flex-col justify-start h-52 border-t-2 border-[#e2e8f0] w-full text-gray p-6'>
                             
                             {/* Advance Filters */}

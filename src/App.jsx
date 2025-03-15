@@ -3,7 +3,7 @@ import './App.css'
 import LandingPage from './pages/LandingPage' 
 import SelectGraph from './pages/SelectGraph'
 import SelectPara from './pages/SelectPara'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 function App() {
 
@@ -14,6 +14,11 @@ function App() {
   const [Xlabel, setXlabel] = useState(Xaxis); // stores X label name
   const [Ylabel, setYlabel] = useState(Yaxis); // stores Y label name
   const [filters, setFilters] = useState([]); // Stores selected filters
+  
+  useEffect(() => {
+    setXlabel(Xaxis);
+    setYlabel(Yaxis);
+  }, [Xaxis, Yaxis]);
 
   return (
     <>
