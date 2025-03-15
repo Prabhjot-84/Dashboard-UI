@@ -19,6 +19,7 @@ const GraphSidebar = ({ setSelectedGraph }) => {
 
     const handleDragStart = (e, graphName) => {
         e.dataTransfer.setData("graphType", graphName);
+        setSelectedGraph(graphName);
     };
 
     return (

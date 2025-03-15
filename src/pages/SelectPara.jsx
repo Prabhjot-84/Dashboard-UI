@@ -1,4 +1,5 @@
-import React from 'react'
+import React, { useState } from 'react'
+import { useNavigate } from 'react-router-dom';
 import ParaSidebar from '../components/ParaSidebar'
 import Dropdown from '../components/Dropdown'
 import { Link } from 'react-router-dom'
@@ -8,7 +9,15 @@ import YaxisImg from '../assets/y-axis.png'
 import XaxisImg from '../assets/x-axis.png'
 import EmptyGraph from '../components/EmptyGraph'
 
-const SelectPara = () => {
+const SelectPara = ( {selectedGraph, setSelectedGraph, graphName, setGraphName, Xaxis, setXAxis, Yaxis, setYAxis, Xlabel, setXlabel, Ylabel, setYlabel, filters, setFilters}  ) => {
+
+    const navigate = useNavigate();
+
+    const goBackFunction = () => {
+        // navigate("/select-graph")
+        window.history.back()
+    }
+
     return (
         <>
             <div className=' bg-slate-200 w-screen h-screen p-4 flex items-center justify-center gap-4'>
@@ -20,11 +29,22 @@ const SelectPara = () => {
                     {/* Title */}
                     <div className='w-full h-fit rounded-t-2xl flex flex-col p-4 border-b-2 border-[#e2e8f0]'>
                         {/* Go Back Button */}
-                        <Link to="/select-graph">
-                            <button className="flex items-center gap-2 text-gray font-semibold hover:cursor-pointer"> 
-                                <img src={Arrow} alt="" /> Go Back 
-                            </button>
-                        </Link>
+                        <button className="w-fit text-gray font-semibold hover:cursor-pointer"> 
+                        <div
+                            className='flex items-center gap-2'
+                            onClick={() => {
+                                if (Xaxis || Yaxis) {
+                                    const confirmNavigation = window.confirm("Are you sure you want to go back? Your selections will be lost.");
+                                    if (confirmNavigation) {
+                                        goBackFunction();
+                                    }
+                                }
+                            }}
+                        >
+                            <img src={Arrow} alt="" /> Go Back 
+                        </div>
+
+                        </button>
                         {/* Heading */}
                         <h1 className='text-xl text-black mt-4 font-medium'> Creating new graph </h1>
                     </div>
@@ -33,19 +53,22 @@ const SelectPara = () => {
                     <div className='w-full h-32 p-4'>
                         {/* Graph-Type */}
                         <div className='flex items-center justify-between mb-3'>
-                            <h1 className='text-lg font-semibold'> Bar Graph-1 </h1>
-                            <Dropdown />
+                            <h1 className='text-lg font-semibold'> {graphName} </h1>
+                            <Dropdown selectedGraph={selectedGraph} setSelectedGraph={setSelectedGraph} />
                         </div>
                         {/* Filter Options */}
                         <div className='flex gap-4 text-primary text-sm font-medium'>
-                            <div className='flex items-center bg-[#edeaff] p-2 pr-4 rounded-lg'>
-                                <img src={Cross} alt="cross-icon" className='w-8' />
-                                Filter Parameter-1
-                            </div>
-                            <div className='flex items-center bg-[#edeaff] p-2 pr-4 rounded-lg'>
-                                <img src={Cross} alt="cross-icon" className='w-8' />
-                                Filter Parameter-2
-                            </div>
+                            {filters.map((filter, index) => (
+                                <div key={index} className='flex items-center bg-[#edeaff] p-2 pr-4 rounded-lg'>
+                                    <img 
+                                        src={Cross} 
+                                        alt="cross-icon" 
+                                        className='w-8 hover:cursor-pointer' 
+                                        onClick={() => setFilters(filters.filter(item => item !== filter))} // Remove filter on click
+                                    />
+                                    {filter}
+                                </div>
+                            ))}
                         </div>
                     </div>
 
@@ -89,7 +112,7 @@ const SelectPara = () => {
                 {/* ------------------------------------------------------------------------------------------ */}
 
                 {/* Right Sidebar */}
-                <ParaSidebar />
+                <ParaSidebar graphName={graphName} setGraphName={setGraphName} Xaxis={Xaxis} setXAxis={setXAxis} Yaxis={Yaxis} setYAxis={setYAxis} Xlabel={Xlabel} setXlabel={setXlabel} Ylabel={Ylabel} setYlabel={setYlabel} filters={filters} setFilters={setFilters} />
 
             </div>
         </>

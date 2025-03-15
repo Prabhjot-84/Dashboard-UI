@@ -26,3 +26,10 @@
 .scrollbar-hidden::-webkit-scrollbar { 
     display: none;
 }
+
+input[type="checkbox"]{
+    width: 15px;
+    height: 15px;
+    accent-color: #6C5DD3;
+}
+

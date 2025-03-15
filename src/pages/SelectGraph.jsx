@@ -5,8 +5,8 @@ import DragDropImage from '../assets/drag-and-drop.png';
 import GraphSidebar from '../components/GraphSidebar';
 import { Link } from 'react-router-dom';
 
-const SelectGraph = () => {
-    const [selectedGraph, setSelectedGraph] = useState(null);
+const SelectGraph = ( {selectedGraph, setSelectedGraph} ) => {
+
     const navigate = useNavigate();
 
     const handleDrop = (e) => {
@@ -16,6 +16,8 @@ const SelectGraph = () => {
             setSelectedGraph(graphType);
             navigate("/select-parameter");  // Navigate after drop
         }
+
+        console.log(selectedGraph);
     };
 
     const handleDragOver = (e) => {
@@ -29,11 +31,13 @@ const SelectGraph = () => {
             <div className='flex-grow bg-white h-full rounded-2xl shadow-2xl flex flex-col p-4'>
 
                 {/* Go Back Button */}
-                <Link to="/">
-                    <button className="flex items-center gap-2 text-gray font-semibold mb-8 hover:cursor-pointer">
-                        <img src={Arrow} alt="" /> Go Back
+                <div className='w-full '>
+                    <button className="text-gray font-semibold mb-8 hover:cursor-pointer">
+                        <Link to="/" className='flex items-center gap-2'>
+                            <img src={Arrow} alt="" /> Go Back
+                        </Link>
                     </button>
-                </Link>
+                </div>
 
                 {/* Heading */}
                 <h1 className='text-xl mb-12 font-medium'> You are creating a new graph </h1>
@@ -46,14 +50,8 @@ const SelectGraph = () => {
                 >
                     <div className='bg-white w-full h-full outline outline-8 outline-white rounded-lg flex flex-col justify-center items-center text-gray font-medium'>
                         <img src={DragDropImage} alt="drag and drop icon" className='mb-4' />
-                        {selectedGraph ? (
-                            <p className="text-primary font-medium">{selectedGraph} selected! Redirecting...</p>
-                        ) : (
-                            <>
-                                <p> <span className='text-primary'>Drag</span> and <span className='text-primary'>Drop</span> a graph style </p>
-                                <p> to get started </p>
-                            </>
-                        )}
+                        <p> <span className='text-primary'>Drag</span> and <span className='text-primary'>Drop</span> a graph style </p>
+                        <p> to get started </p>
                     </div>
                 </div>
             </div>
