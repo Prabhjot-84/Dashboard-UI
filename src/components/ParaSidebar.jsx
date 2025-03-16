@@ -3,9 +3,19 @@ import Pen from '../assets/pen.png'
 import ParameterImg from '../assets/parameter.png'
 import CrossImg from '../assets/cross.png'
 
-const ParaSidebar = ({ graphName, setGraphName, Xaxis, setXAxis, Yaxis, setYAxis, Xlabel, setXlabel, Ylabel, setYlabel, filters, setFilters }) => {
+const ParaSidebar = ({ graphName, setGraphName, Xaxis, setXAxis, Yaxis, setYAxis, Xlabel, setXlabel, Ylabel, setYlabel, filters, setFilters, showFilters, setShowFilters }) => {
 
-    const [showFilters, setShowFilters] = useState(false);
+    const [checkedFilters, setCheckedFilters] = useState({}); // Stores checkbox states
+
+    const parameters = [
+        { name: "State", type: "Categorical" },
+        { name: "District", type: "Categorical" },
+        { name: "Centre Code", type: "Categorical" },
+        { name: "Block", type: "Categorical" },
+        { name: "School Type", type: "Categorical" },
+        { name: "Age Group", type: "Numerical" },
+        { name: "Gender", type: "Categorical" },
+    ];
 
     // Handle drag start (store the parameter being dragged)
     const handleDragStart = (e, paramName) => {
@@ -13,10 +23,28 @@ const ParaSidebar = ({ graphName, setGraphName, Xaxis, setXAxis, Yaxis, setYAxis
     };
 
     useEffect(() => {
-        if (!showFilters) {
-            setFilters([]);
-        }
-    }, [showFilters]);
+        // if (!showFilters && filters.length > 0) {
+        //     setFilters([]); // Only reset if filters are not already empty
+        // }
+
+        console.log(showFilters);
+    
+        setCheckedFilters((prevCheckedFilters) => {
+            const newCheckedFilters = {};
+            let hasChanged = false;
+    
+            parameters.forEach(param => {
+                const isChecked = filters.includes(param.name);
+                newCheckedFilters[param.name] = isChecked;
+    
+                if (prevCheckedFilters[param.name] !== isChecked) {
+                    hasChanged = true;
+                }
+            });
+    
+            return hasChanged ? newCheckedFilters : prevCheckedFilters;
+        });
+    }, [showFilters, filters, parameters]);    
 
     const removeXAxis = () => {
         setXAxis(null);
@@ -30,15 +58,13 @@ const ParaSidebar = ({ graphName, setGraphName, Xaxis, setXAxis, Yaxis, setYAxis
         setFilters([]);
     }
 
-    const parameters = [
-        { name: "State", type: "Categorical" },
-        { name: "District", type: "Categorical" },
-        { name: "Centre Code", type: "Categorical" },
-        { name: "Block", type: "Categorical" },
-        { name: "School Type", type: "Categorical" },
-        { name: "Age Group", type: "Numerical" },
-        { name: "Gender", type: "Categorical" },
-    ];
+    const handleFilterSelect = (paramName) => {
+        if (!filters.includes(paramName)) {
+            setFilters([...filters, paramName]); // Add filter
+        } else {
+            setFilters(filters.filter(item => item !== paramName)); // Remove filter
+        }
+    };
 
     return (
         <>
@@ -94,7 +120,7 @@ const ParaSidebar = ({ graphName, setGraphName, Xaxis, setXAxis, Yaxis, setYAxis
                             {/* Show X-axis div only when Xaxis is not null */}
                             {Xaxis && (
                             <div className='mb-4'>
-                                <h1 className='text-gray text-sm mb-2'> X-axis Parameter </h1>
+                                <h1 className='text-gray text-sm mb-2'> X-axis Label </h1>
                                 <div className='text-primary border-2 border-[#e2e8f0] flex items-center p-2 rounded-md'>
                                 <input type='text' value={Xlabel} onChange={(e) => setXlabel(e.target.value)} className='w-full outline-none text-primary' />
                                 <img src={CrossImg} alt="pen-icon" className='w-8 hover:cursor-pointer' onClick={removeXAxis} />
@@ -105,7 +131,7 @@ const ParaSidebar = ({ graphName, setGraphName, Xaxis, setXAxis, Yaxis, setYAxis
                             {/* Show Y-axis div only when Yaxis is not null */}
                             {Yaxis && (
                             <div>
-                                <h1 className='text-gray text-sm mb-2'> Y-axis Parameter </h1>
+                                <h1 className='text-gray text-sm mb-2'> Y-axis Label </h1>
                                 <div className='text-primary border-2 border-[#e2e8f0] flex items-center p-2 rounded-md'>
                                 <input type='text' value={Ylabel} onChange={(e) => setYlabel(e.target.value)} className='w-full outline-none text-primary' />
                                 <img src={CrossImg} alt="pen-icon" className='w-8 hover:cursor-pointer' onClick={removeYAxis} />
@@ -119,13 +145,19 @@ const ParaSidebar = ({ graphName, setGraphName, Xaxis, setXAxis, Yaxis, setYAxis
                     {/* Element will only render if Xaxis and Yaxis are not null */}
                     {(Xaxis && Yaxis) && (
                         <div className='flex flex-col justify-start h-52 border-t-2 border-[#e2e8f0] w-full text-gray p-6'>
-                            
+
                             {/* Advance Filters */}
                             <div className='flex items-center gap-2'>
-                                <input type="checkbox" className='hover:cursor-pointer' onChange={(e) => setShowFilters(e.target.checked)} /> Advance Filters
+                                <input 
+                                    type="checkbox" 
+                                    className='hover:cursor-pointer' 
+                                    checked={showFilters}
+                                    onChange={(e) => setShowFilters(e.target.checked)} 
+                                /> 
+                                Advance Filters
                             </div>
 
-                            { showFilters && (
+                            {showFilters && (
                                 <>
                                     {parameters
                                         .filter(param => param.name !== Xaxis && param.name !== Yaxis)
@@ -134,17 +166,18 @@ const ParaSidebar = ({ graphName, setGraphName, Xaxis, setXAxis, Yaxis, setYAxis
                                                 <input 
                                                     type="checkbox" 
                                                     className='hover:cursor-pointer' 
+                                                    checked={checkedFilters[param.name] || false} // Ensure it remains checked if in filters
                                                     onChange={(e) => {
                                                         if (e.target.checked) {
-                                                            setFilters([...filters, param.name]); // Add to state
+                                                            setFilters(prevFilters => [...prevFilters, param.name]); // Add to filters
                                                         } else {
-                                                            setFilters(filters.filter(item => item !== param.name)); // Remove from state
+                                                            setFilters(prevFilters => prevFilters.filter(item => item !== param.name)); // Remove from filters
                                                         }
                                                     }}
                                                 /> 
                                                 {param.name}
                                             </div>
-                                    ))}
+                                        ))}
                                 </>
                             )}
                             

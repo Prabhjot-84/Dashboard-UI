@@ -13,12 +13,15 @@ function App() {
   const [Yaxis, setYAxis] = useState(null); // store Y parameter
   const [Xlabel, setXlabel] = useState(Xaxis); // stores X label name
   const [Ylabel, setYlabel] = useState(Yaxis); // stores Y label name
+  const [Zaxis, setZAxis] = useState(null); // stores parameter for pie & doughnut chart
+  const [Zlabel, setZlabel] = useState(Zaxis); // stores label for pie & doughnut chart
   const [filters, setFilters] = useState([]); // Stores selected filters
   
   useEffect(() => {
     setXlabel(Xaxis);
     setYlabel(Yaxis);
-  }, [Xaxis, Yaxis]);
+    setZlabel(Zaxis);
+  }, [Xaxis, Yaxis, Zaxis]);
 
   return (
     <>
@@ -26,7 +29,7 @@ function App() {
       <Routes>
         <Route path="/" element={<LandingPage />} />
         <Route path="/select-graph" element={<SelectGraph selectedGraph={selectedGraph} setSelectedGraph={setSelectedGraph} />} />
-        <Route path="/select-parameter" element={<SelectPara selectedGraph={selectedGraph} setSelectedGraph={setSelectedGraph} graphName={graphName} setGraphName={setGraphName} Xaxis={Xaxis} setXAxis={setXAxis} Yaxis={Yaxis} setYAxis={setYAxis} Xlabel={Xlabel} setXlabel={setXlabel} Ylabel={Ylabel} setYlabel={setYlabel} filters={filters} setFilters={setFilters} />} />
+        <Route path="/select-parameter" element={<SelectPara selectedGraph={selectedGraph} setSelectedGraph={setSelectedGraph} graphName={graphName} setGraphName={setGraphName} Xaxis={Xaxis} setXAxis={setXAxis} Yaxis={Yaxis} setYAxis={setYAxis} Xlabel={Xlabel} setXlabel={setXlabel} Ylabel={Ylabel} setYlabel={setYlabel} Zaxis={Zaxis} setZAxis={setZAxis} Zlabel={Zlabel} setZlabel={setZlabel} filters={filters} setFilters={setFilters} />} />
       </Routes>
     </>
   )
