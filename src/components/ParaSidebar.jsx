@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react'
 import Pen from '../assets/pen.png'
+import { useNavigate } from 'react-router-dom';
 import ParameterImg from '../assets/parameter.png'
 import CrossImg from '../assets/cross.png'
 
 const ParaSidebar = ({ graphName, setGraphName, Xaxis, setXAxis, Yaxis, setYAxis, Xlabel, setXlabel, Ylabel, setYlabel, filters, setFilters, showFilters, setShowFilters }) => {
-
+ const navigate = useNavigate();
     const [checkedFilters, setCheckedFilters] = useState({}); // Stores checkbox states
 
     const parameters = [
@@ -189,7 +190,7 @@ const ParaSidebar = ({ graphName, setGraphName, Xaxis, setXAxis, Yaxis, setYAxis
                 </div>
 
                 {(Xaxis && Yaxis) && (
-                    <button className="flex gap-3 justify-center items-center bg-[#6C5DD3] text-white w-[80%] h-14 mb-6 rounded-lg font-semibold hover:cursor-pointer">
+                    <button  onClick={() => navigate('/graph')}  className="flex gap-3 justify-center items-center bg-[#6C5DD3] text-white w-[80%] h-14 mb-6 rounded-lg font-semibold hover:cursor-pointer">
                         Create Graph
                         {/* <img src={Arrow} alt="" /> */}
                     </button>
