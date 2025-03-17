@@ -66,6 +66,7 @@ const ActionSidebar = () => {
 
 const CreateGraph = () => {
   const location = useLocation();
+  console.log(location.state);
   const {
     selectedGraph,
     graphName,
@@ -76,11 +77,17 @@ const CreateGraph = () => {
     filters = [],
   } = location.state || {};
 
-  const [graphType, setGraphType] = useState(selectedGraph);
+  const [graphType, setGraphType] = useState(null);
   const [studentData, setStudentData] = useState([]);
   const [graphData, setGraphData] = useState({ labels: [], values: [] });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
+  useEffect(() => {
+    if (selectedGraph) {
+      setGraphType(selectedGraph);
+    }
+  }, [selectedGraph]);
 
   // Parameter mapping from ParaSidebar to data fields
   const parameterMapping = {
@@ -248,14 +255,14 @@ const CreateGraph = () => {
           <div className="lg:col-span-2 bg-white rounded-lg shadow-sm p-6">
             <div className="flex justify-between items-center mb-4">
               <div className="flex gap-4">
-                <select
-                  className="px-4 py-2 border border-gray-200 rounded-md text-gray-600 focus:outline-none focus:border-indigo-500"
-                  value={graphType}
-                  onChange={(e) => setGraphType(e.target.value)}
-                >
-                  <option value="bar">Bar Graph</option>
-                  <option value="line">Line Graph</option>
-                </select>
+              <select
+               className="px-4 py-2 border border-gray-200 rounded-md text-gray-600 focus:outline-none focus:border-indigo-500"
+               value={graphType || "bar"} // Default to bar only if graphType is still null
+               onChange={(e) => setGraphType(e.target.value)}
+              >
+               <option value="Bar Graph">Bar Graph</option>
+               <option value="Line Graph">Line Graph</option>
+              </select>
               </div>
 
               <div className="flex gap-2 flex-wrap">
@@ -276,7 +283,7 @@ const CreateGraph = () => {
             </div>
 
             <div className="h-[400px]">
-              {graphType === "line" ? (
+              {graphType === "Line Graph" ? (
                 <Line options={chartOptions} data={chartData} />
               ) : (
                 <Bar options={chartOptions} data={chartData} />
