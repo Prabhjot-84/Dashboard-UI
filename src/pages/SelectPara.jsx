@@ -17,7 +17,6 @@ const SelectPara = ( {selectedGraph, setSelectedGraph, graphName, setGraphName, 
 
     useEffect(() => {
         setFilters([...filters]); // Trigger re-render without modifying filters
-        console.log(filters)
     }, [selectedGraph]);
     
 
@@ -117,7 +116,7 @@ const SelectPara = ( {selectedGraph, setSelectedGraph, graphName, setGraphName, 
                         <div className='h-[460px] w-full flex items-center justify-center px-5'>
                             
                             {/* Drop Zone for Y-axis */}
-                            <div className='h-full w-24 flex justify-center items-center text-sm'
+                            <div className='h-full md:w-24 w-14 flex justify-center items-center text-sm'
                                 onDragOver={(e) => e.preventDefault()}
                                 onDrop={handleDropYaxis}
                             >
@@ -176,11 +175,11 @@ const SelectPara = ( {selectedGraph, setSelectedGraph, graphName, setGraphName, 
 
                 {/* Right Sidebar */}
                 {selectedGraph !== "Pie Graph" && selectedGraph !== "Doughnut Graph" && (
-                    <ParaSidebar graphName={graphName} setGraphName={setGraphName} Xaxis={Xaxis} setXAxis={setXAxis} Yaxis={Yaxis} setYAxis={setYAxis} Xlabel={Xlabel} setXlabel={setXlabel} Ylabel={Ylabel} setYlabel={setYlabel} filters={filters} setFilters={setFilters} showFilters={showFilters} setShowFilters={setShowFilters} />
+                    <ParaSidebar selectedGraph={selectedGraph} graphName={graphName} setGraphName={setGraphName} Xaxis={Xaxis} setXAxis={setXAxis} Yaxis={Yaxis} setYAxis={setYAxis} Xlabel={Xlabel} setXlabel={setXlabel} Ylabel={Ylabel} setYlabel={setYlabel} filters={filters} setFilters={setFilters} showFilters={showFilters} setShowFilters={setShowFilters} />
                 )}
 
                 {(selectedGraph === "Pie Graph" || selectedGraph === "Doughnut Graph") && (
-                    <ParaSidebar2 graphName={graphName} setGraphName={setGraphName} Zaxis={Zaxis} setZAxis={setZAxis} Zlabel={Zlabel} setZlabel={setZlabel} filters={filters} setFilters={setFilters} />
+                    <ParaSidebar2 selectedGraph={selectedGraph} graphName={graphName} setGraphName={setGraphName} Zaxis={Zaxis} setZAxis={setZAxis} Zlabel={Zlabel} setZlabel={setZlabel} filters={filters} setFilters={setFilters} />
                 )}
 
             </div>
