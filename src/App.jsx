@@ -7,6 +7,7 @@ import { useEffect, useState } from 'react'
 import Graph from './pages/Graph'
 import Layout from './pages/GraphPageLayout'
 import GraphList from './pages/GraphList'
+import CreateGraph from './pages/CreatedGraph'
 
 function App() {
 
