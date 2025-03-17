@@ -2,8 +2,9 @@ import React, { useEffect, useState } from 'react'
 import Pen from '../assets/pen.png'
 import ParameterImg from '../assets/parameter.png'
 import CrossImg from '../assets/cross.png'
+import { Link } from 'react-router-dom'
 
-const ParaSidebar = ({ graphName, setGraphName, Xaxis, setXAxis, Yaxis, setYAxis, Xlabel, setXlabel, Ylabel, setYlabel, filters, setFilters }) => {
+const ParaSidebar = ({ selectedGraph ,graphName, setGraphName, Xaxis, setXAxis, Yaxis, setYAxis, Xlabel, setXlabel, Ylabel, setYlabel, filters, setFilters }) => {
 
     const [showFilters, setShowFilters] = useState(false);
 
@@ -154,14 +155,16 @@ const ParaSidebar = ({ graphName, setGraphName, Xaxis, setXAxis, Yaxis, setYAxis
 
 
                 </div>
-
+                <Link to="/create-graph"
+                  state={{ selectedGraph , graphName, Xaxis, Yaxis, Xlabel, Ylabel, filters }}
+                  >
                 {(Xaxis && Yaxis) && (
                     <button className="flex gap-3 justify-center items-center bg-[#6C5DD3] text-white w-[80%] h-14 mb-6 rounded-lg font-semibold hover:cursor-pointer">
                         Create Graph
                         {/* <img src={Arrow} alt="" /> */}
                     </button>
                 )}
-
+              </Link>
             </div>
         </>
     )

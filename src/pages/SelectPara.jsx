@@ -135,7 +135,7 @@ const SelectPara = ( {selectedGraph, setSelectedGraph, graphName, setGraphName, 
                 {/* ------------------------------------------------------------------------------------------ */}
 
                 {/* Right Sidebar */}
-                <ParaSidebar graphName={graphName} setGraphName={setGraphName} Xaxis={Xaxis} setXAxis={setXAxis} Yaxis={Yaxis} setYAxis={setYAxis} Xlabel={Xlabel} setXlabel={setXlabel} Ylabel={Ylabel} setYlabel={setYlabel} filters={filters} setFilters={setFilters} />
+                <ParaSidebar selectedGraph={selectedGraph} graphName={graphName} setGraphName={setGraphName} Xaxis={Xaxis} setXAxis={setXAxis} Yaxis={Yaxis} setYAxis={setYAxis} Xlabel={Xlabel} setXlabel={setXlabel} Ylabel={Ylabel} setYlabel={setYlabel} filters={filters} setFilters={setFilters} />
 
             </div>
         </>
