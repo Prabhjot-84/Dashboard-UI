@@ -13,14 +13,21 @@ const graphs = [
   { name: "Doughnut Graph", img: DoughnutGraphImg },
 ];
 
-const GraphSidebar = ({ setSelectedGraph }) => {
+const GraphSidebar = ({ isDragging, setIsDragging, setSelectedGraph }) => {
     
     const navigate = useNavigate();
 
     const handleDragStart = (e, graphName) => {
         e.dataTransfer.setData("graphType", graphName);
         setSelectedGraph(graphName);
+        setIsDragging(true);
+        // document.body.classList.add("dragging");  // Add dragging class
     };
+    
+    const handleDragEnd = () => {
+        // document.body.classList.remove("dragging");  // Remove dragging class when drag ends
+        setIsDragging(false);
+    };    
 
     return (
         <div className="h-full lg:w-96 md:w-[320px] w-72 flex flex-col items-center lg:p-6 py-6 px-2 overflow-y-scroll scrollbar-hidden">
@@ -41,6 +48,7 @@ const GraphSidebar = ({ setSelectedGraph }) => {
                         key={index}
                         draggable
                         onDragStart={(e) => handleDragStart(e, graph.name)}
+                        onDragEnd={handleDragEnd}  // Call handleDragEnd when dragging ends
                         className="w-full lg:h-28 md:h-24 h-20 bg-white rounded-2xl shadow-lg flex items-center text-sm mb-4 hover:border hover:border-[#6C5DD3] hover:cursor-pointer"
                     >
                         <div className="lg:w-1/3 w-[30%] h-full border-r-3 border-[#e2e8f0] flex items-center justify-center">

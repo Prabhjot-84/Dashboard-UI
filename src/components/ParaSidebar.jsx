@@ -3,10 +3,13 @@ import Pen from '../assets/pen.png'
 import { useNavigate } from 'react-router-dom';
 import ParameterImg from '../assets/parameter.png'
 import CrossImg from '../assets/cross.png'
+import ArrowDown from '../assets/down-arrow.png'
+import ArrowUp from '../assets/up-arrow.png'
 
 const ParaSidebar = ({ selectedGraph, graphName, setGraphName, Xaxis, setXAxis, Yaxis, setYAxis, Xlabel, setXlabel, Ylabel, setYlabel, filters, setFilters, showFilters, setShowFilters }) => {
  const navigate = useNavigate();
     const [checkedFilters, setCheckedFilters] = useState({}); // Stores checkbox states
+    const [filterToggle, setFilterToggle] = useState(false);
 
     const parameters = [
         { name: "State", type: "Categorical" },
@@ -89,28 +92,25 @@ const ParaSidebar = ({ selectedGraph, graphName, setGraphName, Xaxis, setXAxis, 
                     </div>
 
                     {/* Parameters */}
-                    {!showFilters && (
-                        <div className='flex flex-col justify-start w-full text-gray p-6 border-t-2 border-[#e2e8f0]'>
-                            <div>
-                                <h1 className='text-gray text-sm mb-2'> Parameters </h1>
-                                
-                                {parameters
-                                    .filter(param => param.name !== Xaxis && param.name !== Yaxis)
-                                    .map((param, index) => (
-                                        <div
-                                            key={index}
-                                            className="text-primary border-2 border-[#e2e8f0] flex items-center gap-4 p-2 rounded-md mb-3 hover:border-[#6C5DD3] hover:cursor-pointer"
-                                            draggable
-                                            onDragStart={(e) => handleDragStart(e, param.name)}
-                                        >
-                                            <img src={ParameterImg} alt="parameter-icon" />
-                                            <p>{param.name}</p>
-                                        </div>
-                                ))}
-                            </div>
+                    <div className='flex flex-col justify-start w-full text-gray p-6 border-t-2 border-[#e2e8f0]'>
+                        <div>
+                            <h1 className='text-gray text-sm mb-2'> Parameters </h1>
+                            
+                            {parameters
+                                .filter(param => param.name !== Xaxis && param.name !== Yaxis)
+                                .map((param, index) => (
+                                    <div
+                                        key={index}
+                                        className="text-primary border-2 border-[#e2e8f0] flex items-center gap-4 p-2 rounded-md mb-3 hover:border-[#6C5DD3] hover:cursor-pointer"
+                                        draggable
+                                        onDragStart={(e) => handleDragStart(e, param.name)}
+                                    >
+                                        <img src={ParameterImg} alt="parameter-icon" />
+                                        <p>{param.name}</p>
+                                    </div>
+                            ))}
                         </div>
-                    )}
-
+                    </div>
 
                     {/* The outer <div> will only render if either Xaxis or Yaxis is not null. */}
                     {(Xaxis || Yaxis) && (
@@ -146,22 +146,28 @@ const ParaSidebar = ({ selectedGraph, graphName, setGraphName, Xaxis, setXAxis, 
                         <div className='flex flex-col justify-start h-52 border-t-2 border-[#e2e8f0] w-full text-gray p-6'>
 
                             {/* Advance Filters */}
-                            <div className='flex items-center gap-2'>
-                                <input 
-                                    type="checkbox" 
-                                    className='hover:cursor-pointer' 
-                                    checked={showFilters}
-                                    onChange={(e) => setShowFilters(e.target.checked)} 
-                                /> 
-                                Advance Filters
+                            <div className='flex items-center justify-between gap-2 text-base p-2'>
+                                <div>
+                                    <input 
+                                        type="checkbox" 
+                                        className='hover:cursor-pointer' 
+                                        checked={showFilters}
+                                        onChange={(e) => setShowFilters(e.target.checked)} 
+                                    /> 
+                                    &nbsp; Advance Filters
+                                </div>
+                                {!filterToggle && (<img src={ArrowDown} alt="" className='hover:cursor-pointer' onClick={() => setFilterToggle(true)} /> ) }
+                                {filterToggle && (<img src={ArrowUp} alt="" className='hover:cursor-pointer' onClick={() => setFilterToggle(false)} /> ) }
                             </div>
 
                             {showFilters && (
                                 <>
+                                {filterToggle && (
+                                <div className='p-2 pb-4 '>
                                     {parameters
                                         .filter(param => param.name !== Xaxis && param.name !== Yaxis)
                                         .map((param, index) => (
-                                            <div key={index} className='flex items-center gap-2'>
+                                            <div key={index} className='flex items-center gap-2 p-2'>
                                                 <input 
                                                     type="checkbox" 
                                                     className='hover:cursor-pointer' 
@@ -176,7 +182,10 @@ const ParaSidebar = ({ selectedGraph, graphName, setGraphName, Xaxis, setXAxis, 
                                                 /> 
                                                 {param.name}
                                             </div>
-                                        ))}
+                                        ))
+                                    }
+                                </div>
+                                )}
                                 </>
                             )}
                             
@@ -187,7 +196,7 @@ const ParaSidebar = ({ selectedGraph, graphName, setGraphName, Xaxis, setXAxis, 
 
                 </div>
 
-                {(Xaxis && Yaxis && selectedGraph) && (
+                {(Xaxis && Yaxis) && (
                     <button  onClick={() => navigate('/graph')}  className="flex gap-3 justify-center items-center bg-[#6C5DD3] text-white w-[80%] h-14 mb-6 rounded-lg font-semibold hover:cursor-pointer">
                         Create Graph
                         {/* <img src={Arrow} alt="" /> */}

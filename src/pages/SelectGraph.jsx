@@ -8,21 +8,24 @@ import { Link } from 'react-router-dom';
 const SelectGraph = ( {selectedGraph, setSelectedGraph} ) => {
 
     const navigate = useNavigate();
+    const [isDragging, setIsDragging] = useState(false);
 
     const handleDrop = (e) => {
         e.preventDefault();
+        setIsDragging(false);
+        // document.body.classList.remove("dragging");  // Remove dragging class
         const graphType = e.dataTransfer.getData("graphType");
         if (graphType) {
             setSelectedGraph(graphType);
-            navigate("/select-parameter");  // Navigate after drop
+            navigate("/select-parameter");
         }
-
-        console.log(selectedGraph);
     };
-
+    
     const handleDragOver = (e) => {
         e.preventDefault();
-    };
+        setIsDragging(true);
+        // document.body.classList.add("dragging");  // Add dragging class
+    };    
 
     return (
         <div className='bg-slate-200 w-screen h-screen p-4 flex items-center gap-4'>
@@ -44,11 +47,11 @@ const SelectGraph = ( {selectedGraph, setSelectedGraph} ) => {
 
                 {/* Drag and Drop Section */}
                 <div
-                    className='border-10 border-dashed border-[#6C5DD3] w-full h-2/3 rounded-2xl'
+                    className={`border-10 border-dashed border-[#6C5DD3] w-full h-2/3 rounded-2xl `}
                     onDrop={handleDrop}
                     onDragOver={handleDragOver}
                 >
-                    <div className='bg-white w-full h-full outline outline-8 outline-white rounded-lg flex flex-col justify-center items-center text-gray font-medium'>
+                    <div className={`${isDragging ? "bg-[#e2e8f0]" : "bg-white"} w-full h-full outline outline-8 outline-white rounded-lg flex flex-col justify-center items-center text-gray font-medium`} >
                         <img src={DragDropImage} alt="drag and drop icon" className='mb-4' />
                         <p> <span className='text-primary'>Drag</span> and <span className='text-primary'>Drop</span> a graph style </p>
                         <p> to get started </p>
@@ -57,7 +60,7 @@ const SelectGraph = ( {selectedGraph, setSelectedGraph} ) => {
             </div>
 
             {/* Graph Options */}
-            <GraphSidebar setSelectedGraph={setSelectedGraph} />
+            <GraphSidebar isDragging={isDragging} setIsDragging={setIsDragging} setSelectedGraph={setSelectedGraph} />
 
         </div>
     );

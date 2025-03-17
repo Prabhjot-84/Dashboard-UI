@@ -15,9 +15,13 @@ const SelectPara = ( {selectedGraph, setSelectedGraph, graphName, setGraphName, 
     const navigate = useNavigate();
     const [showFilters, setShowFilters] = useState(false);
 
+    // useEffect(() => {
+    //     setFilters([...filters]); // Trigger re-render without modifying filters
+    // }, [selectedGraph]);
+
     useEffect(() => {
-        setFilters([...filters]); // Trigger re-render without modifying filters
-    }, [selectedGraph]);
+        setFilters((prevFilters) => prevFilters); // Trigger re-render without modifying state
+    }, [selectedGraph, filters]);  // Re-run when either changes    
     
 
     const goBackFunction = () => {
@@ -35,12 +39,14 @@ const SelectPara = ( {selectedGraph, setSelectedGraph, graphName, setGraphName, 
         e.preventDefault();
         const droppedParam = e.dataTransfer.getData("parameter");
         setXAxis(droppedParam);
+        setFilters((prevFilters) => prevFilters.filter((item) => item !== droppedParam)); // Remove from filters
     };
 
     const handleDropYaxis = (e) => {
         e.preventDefault();
         const droppedParam = e.dataTransfer.getData("parameter");
         setYAxis(droppedParam);
+        setFilters((prevFilters) => prevFilters.filter((item) => item !== droppedParam)); // Remove from filters
     }
 
     const handleDropZaxis = (e) => {
@@ -113,7 +119,7 @@ const SelectPara = ( {selectedGraph, setSelectedGraph, graphName, setGraphName, 
                     {/* Drag and Drop Section */}
 
                     {selectedGraph !== "Pie Graph" && selectedGraph !== "Doughnut Graph" && (
-                        <div className='h-[460px] w-full flex items-center justify-center px-5'>
+                        <div className='h-full w-full flex items-center justify-center px-5'>
                             
                             {/* Drop Zone for Y-axis */}
                             <div className='h-full md:w-24 w-14 flex justify-center items-center text-sm'
@@ -130,15 +136,15 @@ const SelectPara = ( {selectedGraph, setSelectedGraph, graphName, setGraphName, 
 
                             <div className='h-full flex flex-col flex-grow'>
                                 {/* Graph image */}
-                                <div className='h-5/6 w-full mt-2.5'>
+                                <div className='h-full w-full mt-2.5'>
                                     <EmptyGraph />
                                 </div>
                                 {/* Drop Zone for X-axis */}
-                                <div className='h-1/6 w-full flex items-center justify-center text-sm'
+                                <div className='h-[60px] w-full flex items-center justify-center text-sm mb-4'
                                     onDragOver={(e) => e.preventDefault()}
                                     onDrop={handleDropXaxis}
                                 >
-                                    <div className='border-4 border-dashed border-[#6C5DD3] rounded'>
+                                    <div className='h-[55px] border-4 border-dashed border-[#6C5DD3] rounded'>
                                         <div className='w-full flex items-center outline-3 outline-white rounded-xs p-2'>
                                             <img src={XaxisImg} alt="" />
                                             {Xaxis ? `${Xlabel}` : "Drag and Drop your 'X' parameter here"}

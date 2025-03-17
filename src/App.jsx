@@ -10,7 +10,7 @@ import GraphList from './pages/GraphList'
 
 function App() {
 
-  const [selectedGraph, setSelectedGraph] = useState(null);
+  const [selectedGraph, setSelectedGraph] = useState("Line Graph");
   const [graphName, setGraphName] = useState("");
   const [Xaxis, setXAxis] = useState(null); // stores X parameter
   const [Yaxis, setYAxis] = useState(null); // store Y parameter
