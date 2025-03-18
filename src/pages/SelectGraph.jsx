@@ -51,7 +51,7 @@ const SelectGraph = ( {selectedGraph, setSelectedGraph} ) => {
                     onDrop={handleDrop}
                     onDragOver={handleDragOver}
                 >
-                    <div className={`${isDragging ? "bg-[#e2e8f0]" : "bg-white"} w-full h-full outline outline-8 outline-white rounded-lg flex flex-col justify-center items-center text-gray font-medium`} >
+                    <div className={`${isDragging ? "bg-[#eef1ff]" : "bg-white"} w-full h-full outline outline-8 outline-white rounded-lg flex flex-col justify-center items-center text-gray font-medium`} >
                         <img src={DragDropImage} alt="drag and drop icon" className='mb-4' />
                         <p> <span className='text-primary'>Drag</span> and <span className='text-primary'>Drop</span> a graph style </p>
                         <p> to get started </p>
