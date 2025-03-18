@@ -5,6 +5,7 @@ import ParameterImg from '../assets/parameter.png'
 import CrossImg from '../assets/cross.png'
 import ArrowDown from '../assets/down-arrow.png'
 import ArrowUp from '../assets/up-arrow.png'
+import { Link } from 'react-router-dom'
 
 const ParaSidebar = ({ selectedGraph, graphName, setGraphName, Xaxis, setXAxis, Yaxis, setYAxis, Xlabel, setXlabel, Ylabel, setYlabel, filters, setFilters, showFilters, setShowFilters }) => {
  const navigate = useNavigate();
@@ -195,14 +196,22 @@ const ParaSidebar = ({ selectedGraph, graphName, setGraphName, Xaxis, setXAxis, 
 
 
                 </div>
+<<<<<<< HEAD
 
                 {(Xaxis && Yaxis) && (
                     <button  onClick={() => navigate('/graph')}  className="flex gap-3 justify-center items-center bg-[#6C5DD3] text-white w-[80%] h-14 mb-6 rounded-lg font-semibold hover:cursor-pointer">
+=======
+                <Link to="/create-graph"
+                  state={{ selectedGraph , graphName, Xaxis, Yaxis, Xlabel, Ylabel, filters }}
+                  >
+                {(Xaxis && Yaxis) && (
+                    <button className="flex gap-3 justify-center items-center bg-[#6C5DD3] text-white w-[80%] h-14 mb-6 rounded-lg font-semibold hover:cursor-pointer">
+>>>>>>> e4d95c86e7adea87b0728c97a421f95ef4f107ed
                         Create Graph
                         {/* <img src={Arrow} alt="" /> */}
                     </button>
                 )}
-
+              </Link>
             </div>
         </>
     )
