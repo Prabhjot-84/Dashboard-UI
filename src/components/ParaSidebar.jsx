@@ -1,14 +1,13 @@
 import React, { useEffect, useState } from 'react'
 import Pen from '../assets/pen.png'
-import { useNavigate } from 'react-router-dom';
 import ParameterImg from '../assets/parameter.png'
 import CrossImg from '../assets/cross.png'
 import ArrowDown from '../assets/down-arrow.png'
 import ArrowUp from '../assets/up-arrow.png'
 import { Link } from 'react-router-dom'
 
-const ParaSidebar = ({ selectedGraph, graphName, setGraphName, Xaxis, setXAxis, Yaxis, setYAxis, Xlabel, setXlabel, Ylabel, setYlabel, filters, setFilters, showFilters, setShowFilters }) => {
- const navigate = useNavigate();
+const ParaSidebar = ({ isDragging, setIsDragging, selectedGraph, graphName, setGraphName, Xaxis, setXAxis, Yaxis, setYAxis, Xlabel, setXlabel, Ylabel, setYlabel, filters, setFilters, showFilters, setShowFilters }) => {
+    
     const [checkedFilters, setCheckedFilters] = useState({}); // Stores checkbox states
     const [filterToggle, setFilterToggle] = useState(false);
 
@@ -25,13 +24,15 @@ const ParaSidebar = ({ selectedGraph, graphName, setGraphName, Xaxis, setXAxis, 
     // Handle drag start (store the parameter being dragged)
     const handleDragStart = (e, paramName) => {
         e.dataTransfer.setData("parameter", paramName);
+        setIsDragging(true);
+    };
+
+    const handleDragEnd = () => {
+        setIsDragging(false);
     };
 
     useEffect(() => {
-        if (!showFilters && filters.length > 0) {
-            setFilters([]); // Only reset if filters are not already empty
-        }
-    
+            
         setCheckedFilters((prevCheckedFilters) => {
             const newCheckedFilters = {};
             let hasChanged = false;
@@ -105,6 +106,7 @@ const ParaSidebar = ({ selectedGraph, graphName, setGraphName, Xaxis, setXAxis, 
                                         className="text-primary border-2 border-[#e2e8f0] flex items-center gap-4 p-2 rounded-md mb-3 hover:border-[#6C5DD3] hover:cursor-pointer"
                                         draggable
                                         onDragStart={(e) => handleDragStart(e, param.name)}
+                                        onDragEnd={handleDragEnd}
                                     >
                                         <img src={ParameterImg} alt="parameter-icon" />
                                         <p>{param.name}</p>
@@ -147,45 +149,37 @@ const ParaSidebar = ({ selectedGraph, graphName, setGraphName, Xaxis, setXAxis, 
                         <div className='flex flex-col justify-start h-52 border-t-2 border-[#e2e8f0] w-full text-gray p-6'>
 
                             {/* Advance Filters */}
-                            <div className='flex items-center justify-between gap-2 text-base p-2'>
-                                <div>
-                                    <input 
-                                        type="checkbox" 
-                                        className='hover:cursor-pointer' 
-                                        checked={showFilters}
-                                        onChange={(e) => setShowFilters(e.target.checked)} 
-                                    /> 
-                                    &nbsp; Advance Filters
-                                </div>
-                                {!filterToggle && (<img src={ArrowDown} alt="" className='hover:cursor-pointer' onClick={() => setFilterToggle(true)} /> ) }
-                                {filterToggle && (<img src={ArrowUp} alt="" className='hover:cursor-pointer' onClick={() => setFilterToggle(false)} /> ) }
+                            <div className='flex items-center justify-between gap-2 text-base p-2 hover:cursor-pointer' onClick={() => { setFilterToggle(prev => !prev); setShowFilters(prev => !prev); }}>
+                                <div> Advance Filters </div>
+                                {!filterToggle && (<img src={ArrowDown} alt="icon" /> ) }
+                                {filterToggle && (<img src={ArrowUp} alt="icon" /> ) }
                             </div>
 
                             {showFilters && (
                                 <>
                                 {filterToggle && (
-                                <div className='p-2 pb-4 '>
-                                    {parameters
-                                        .filter(param => param.name !== Xaxis && param.name !== Yaxis)
-                                        .map((param, index) => (
-                                            <div key={index} className='flex items-center gap-2 p-2'>
-                                                <input 
-                                                    type="checkbox" 
-                                                    className='hover:cursor-pointer' 
-                                                    checked={checkedFilters[param.name] || false} // Ensure it remains checked if in filters
-                                                    onChange={(e) => {
-                                                        if (e.target.checked) {
-                                                            setFilters(prevFilters => [...prevFilters, param.name]); // Add to filters
-                                                        } else {
-                                                            setFilters(prevFilters => prevFilters.filter(item => item !== param.name)); // Remove from filters
-                                                        }
-                                                    }}
-                                                /> 
-                                                {param.name}
-                                            </div>
-                                        ))
-                                    }
-                                </div>
+                                    <div className='p-2 pb-4 '>
+                                        {parameters
+                                            .filter(param => param.name !== Xaxis && param.name !== Yaxis)
+                                            .map((param, index) => (
+                                                <div key={index} className='flex items-center gap-2 p-2'>
+                                                    <input 
+                                                        type="checkbox" 
+                                                        className='hover:cursor-pointer' 
+                                                        checked={checkedFilters[param.name] || false} // Ensure it remains checked if in filters
+                                                        onChange={(e) => {
+                                                            if (e.target.checked) {
+                                                                setFilters(prevFilters => [...prevFilters, param.name]); // Add to filters
+                                                            } else {
+                                                                setFilters(prevFilters => prevFilters.filter(item => item !== param.name)); // Remove from filters
+                                                            }
+                                                        }}
+                                                    /> 
+                                                    {param.name}
+                                                </div>
+                                            ))
+                                        }
+                                    </div>
                                 )}
                                 </>
                             )}
@@ -196,16 +190,16 @@ const ParaSidebar = ({ selectedGraph, graphName, setGraphName, Xaxis, setXAxis, 
 
 
                 </div>
-                <Link to="/create-graph"
-                  state={{ selectedGraph , graphName, Xaxis, Yaxis, Xlabel, Ylabel, filters }}
-                  >
+                
                 {(Xaxis && Yaxis) && (
                     <button className="flex gap-3 justify-center items-center bg-[#6C5DD3] text-white w-[80%] h-14 mb-6 rounded-lg font-semibold hover:cursor-pointer">
-                        Create Graph
-                        {/* <img src={Arrow} alt="" /> */}
+                        <Link to="/create-graph"
+                            state={{ selectedGraph , graphName, Xaxis, Yaxis, Xlabel, Ylabel, filters }}
+                        >
+                            Create Graph
+                        </Link>
                     </button>
                 )}
-              </Link>
             </div>
         </>
     )

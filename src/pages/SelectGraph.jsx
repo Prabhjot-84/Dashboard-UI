@@ -5,15 +5,21 @@ import DragDropImage from '../assets/drag-and-drop.png';
 import GraphSidebar from '../components/GraphSidebar';
 import { Link } from 'react-router-dom';
 
-const SelectGraph = ( {selectedGraph, setSelectedGraph} ) => {
+const SelectGraph = ( {selectedGraph, setSelectedGraph, setGraphName, setXAxis, setYAxis, setZAxis, setFilters} ) => {
 
     const navigate = useNavigate();
     const [isDragging, setIsDragging] = useState(false);
 
     const handleDrop = (e) => {
         e.preventDefault();
+
+        setGraphName("");
+        setXAxis(null);
+        setYAxis(null);
+        setZAxis(null);
+        setFilters([]);
+
         setIsDragging(false);
-        // document.body.classList.remove("dragging");  // Remove dragging class
         const graphType = e.dataTransfer.getData("graphType");
         if (graphType) {
             setSelectedGraph(graphType);
@@ -24,7 +30,6 @@ const SelectGraph = ( {selectedGraph, setSelectedGraph} ) => {
     const handleDragOver = (e) => {
         e.preventDefault();
         setIsDragging(true);
-        // document.body.classList.add("dragging");  // Add dragging class
     };    
 
     return (
@@ -51,7 +56,7 @@ const SelectGraph = ( {selectedGraph, setSelectedGraph} ) => {
                     onDrop={handleDrop}
                     onDragOver={handleDragOver}
                 >
-                    <div className={`${isDragging ? "bg-[#eef1ff]" : "bg-white"} w-full h-full outline outline-8 outline-white rounded-lg flex flex-col justify-center items-center text-gray font-medium`} >
+                    <div className={`${isDragging ? "bg-[#eef1ff]" : "bg-white"} w-full h-full outline outline-8 ${isDragging ? "outline-[#eef1ff]" : "outline-white"} rounded-lg flex flex-col justify-center items-center text-gray font-medium`} >
                         <img src={DragDropImage} alt="drag and drop icon" className='mb-4' />
                         <p> <span className='text-primary'>Drag</span> and <span className='text-primary'>Drop</span> a graph style </p>
                         <p> to get started </p>

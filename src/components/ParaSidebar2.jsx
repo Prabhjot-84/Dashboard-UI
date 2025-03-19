@@ -4,12 +4,17 @@ import Pen from '../assets/pen.png';
 import ParameterImg from '../assets/parameter.png';
 import CrossImg from '../assets/cross.png';
 
-const ParaSidebar2 = ({ graphName, setGraphName, Zaxis, setZAxis, Zlabel, setZlabel }) => {
+const ParaSidebar2 = ({ setIsDragging, graphName, setGraphName, Zaxis, setZAxis, Zlabel, setZlabel }) => {
     const navigate = useNavigate();
 
     // Handle drag start (store the parameter being dragged)
     const handleDragStart = (e, paramName) => {
         e.dataTransfer.setData("parameter", paramName);
+        setIsDragging(true);
+    };
+
+    const handleDragEnd = () => {
+        setIsDragging(false);
     };
 
     const removeZAxis = () => {
@@ -63,6 +68,7 @@ const ParaSidebar2 = ({ graphName, setGraphName, Zaxis, setZAxis, Zlabel, setZla
                                     className="text-primary border-2 border-[#e2e8f0] flex items-center gap-4 p-2 rounded-md mb-3 hover:border-[#6C5DD3] hover:cursor-pointer"
                                     draggable
                                     onDragStart={(e) => handleDragStart(e, param.name)}
+                                    onDragEnd={handleDragEnd}
                                 >
                                     <img src={ParameterImg} alt="parameter-icon" />
                                     <p>{param.name}</p>

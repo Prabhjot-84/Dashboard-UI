@@ -14,10 +14,7 @@ const SelectPara = ( {selectedGraph, setSelectedGraph, graphName, setGraphName, 
 
     const navigate = useNavigate();
     const [showFilters, setShowFilters] = useState(false);
-
-    // useEffect(() => {
-    //     setFilters([...filters]); // Trigger re-render without modifying filters
-    // }, [selectedGraph]);
+    const [isDragging, setIsDragging] = useState(false);
 
     useEffect(() => {
         setFilters((prevFilters) => prevFilters); // Trigger re-render without modifying state
@@ -37,6 +34,7 @@ const SelectPara = ( {selectedGraph, setSelectedGraph, graphName, setGraphName, 
     // Handle drop event for X-axis
     const handleDropXaxis = (e) => {
         e.preventDefault();
+        setIsDragging(false);
         const droppedParam = e.dataTransfer.getData("parameter");
         setXAxis(droppedParam);
         setFilters((prevFilters) => prevFilters.filter((item) => item !== droppedParam)); // Remove from filters
@@ -44,6 +42,7 @@ const SelectPara = ( {selectedGraph, setSelectedGraph, graphName, setGraphName, 
 
     const handleDropYaxis = (e) => {
         e.preventDefault();
+        setIsDragging(false);
         const droppedParam = e.dataTransfer.getData("parameter");
         setYAxis(droppedParam);
         setFilters((prevFilters) => prevFilters.filter((item) => item !== droppedParam)); // Remove from filters
@@ -51,9 +50,15 @@ const SelectPara = ( {selectedGraph, setSelectedGraph, graphName, setGraphName, 
 
     const handleDropZaxis = (e) => {
         e.preventDefault();
+        setIsDragging(false);
         const droppedParam = e.dataTransfer.getData("parameter");
         setZAxis(droppedParam);
     }
+
+    const handleDragOver = (e) => {
+        e.preventDefault();
+        setIsDragging(true);
+    };
 
     return (
         <>
@@ -123,11 +128,11 @@ const SelectPara = ( {selectedGraph, setSelectedGraph, graphName, setGraphName, 
                             
                             {/* Drop Zone for Y-axis */}
                             <div className='h-full md:w-24 w-14 flex justify-center items-center text-sm'
-                                onDragOver={(e) => e.preventDefault()}
+                                onDragOver={handleDragOver}
                                 onDrop={handleDropYaxis}
                             >
                                 <div className='border-4 border-dashed border-[#6C5DD3] rounded w-fit inline-block -rotate-90'>
-                                    <div className='w-max h-[50px] flex items-center gap-2 outline-3 outline-white rounded-xs p-2'>
+                                    <div className={`${isDragging ? "bg-[#eef1ff]" : "bg-white"} w-max h-[50px] flex items-center gap-2 outline-3 ${isDragging ? "outline-[#eef1ff]" : "outline-white"} rounded-xs p-2`}>
                                         <img src={YaxisImg} alt="" />
                                         {Yaxis ? `${Ylabel}` : "Drag and Drop you 'Y' parameter here"}
                                     </div>
@@ -141,11 +146,11 @@ const SelectPara = ( {selectedGraph, setSelectedGraph, graphName, setGraphName, 
                                 </div>
                                 {/* Drop Zone for X-axis */}
                                 <div className='h-[60px] w-full flex items-center justify-center text-sm mb-4'
-                                    onDragOver={(e) => e.preventDefault()}
+                                    onDragOver={handleDragOver}
                                     onDrop={handleDropXaxis}
                                 >
                                     <div className='h-[55px] border-4 border-dashed border-[#6C5DD3] rounded'>
-                                        <div className='w-full flex items-center outline-3 outline-white rounded-xs p-2'>
+                                        <div className={`${isDragging ? "bg-[#eef1ff]" : "bg-white"} w-full flex items-center outline-3 ${isDragging ? "outline-[#eef1ff]" : "outline-white"} rounded-xs p-2`}>
                                             <img src={XaxisImg} alt="" />
                                             {Xaxis ? `${Xlabel}` : "Drag and Drop your 'X' parameter here"}
                                         </div>
@@ -160,11 +165,11 @@ const SelectPara = ( {selectedGraph, setSelectedGraph, graphName, setGraphName, 
                         <div className='h-[460px] w-full flex items-center justify-center px-5'>
 
                             <div className='xl:w-1/2 lg:w-2/3 w-full h-2/3 flex items-center justify-center text-sm'
-                                onDragOver={(e) => e.preventDefault()}
+                                onDragOver={handleDragOver}
                                 onDrop={handleDropZaxis}
                             >
                                 <div className='w-full h-full border-4 border-dashed border-[#6C5DD3] rounded'>
-                                    <div className='w-full h-full flex flex-col items-center justify-center outline-3 outline-white rounded-xs p-2'>
+                                    <div className={`${isDragging ? "bg-[#eef1ff]" : "bg-white"} w-full h-full flex flex-col items-center justify-center outline-3 ${isDragging ? "outline-[#eef1ff]" : "outline-white"} rounded-xs p-2`}>
                                         <h1 className='text-xl font-semibold text-gray'> Your {selectedGraph} will appear here </h1>
                                         <br />
                                         <span className='text-primary text-base'> {Zaxis ? `${Zlabel}` : "Drag and Drop your parameter here"} </span>
@@ -181,11 +186,11 @@ const SelectPara = ( {selectedGraph, setSelectedGraph, graphName, setGraphName, 
 
                 {/* Right Sidebar */}
                 {selectedGraph !== "Pie Graph" && selectedGraph !== "Doughnut Graph" && (
-                    <ParaSidebar selectedGraph={selectedGraph} graphName={graphName} setGraphName={setGraphName} Xaxis={Xaxis} setXAxis={setXAxis} Yaxis={Yaxis} setYAxis={setYAxis} Xlabel={Xlabel} setXlabel={setXlabel} Ylabel={Ylabel} setYlabel={setYlabel} filters={filters} setFilters={setFilters} showFilters={showFilters} setShowFilters={setShowFilters} />
+                    <ParaSidebar setIsDragging={setIsDragging} selectedGraph={selectedGraph} graphName={graphName} setGraphName={setGraphName} Xaxis={Xaxis} setXAxis={setXAxis} Yaxis={Yaxis} setYAxis={setYAxis} Xlabel={Xlabel} setXlabel={setXlabel} Ylabel={Ylabel} setYlabel={setYlabel} filters={filters} setFilters={setFilters} showFilters={showFilters} setShowFilters={setShowFilters} />
                 )}
 
                 {(selectedGraph === "Pie Graph" || selectedGraph === "Doughnut Graph") && (
-                    <ParaSidebar2 selectedGraph={selectedGraph} graphName={graphName} setGraphName={setGraphName} Zaxis={Zaxis} setZAxis={setZAxis} Zlabel={Zlabel} setZlabel={setZlabel} filters={filters} setFilters={setFilters} />
+                    <ParaSidebar2 setIsDragging={setIsDragging} selectedGraph={selectedGraph} graphName={graphName} setGraphName={setGraphName} Zaxis={Zaxis} setZAxis={setZAxis} Zlabel={Zlabel} setZlabel={setZlabel} filters={filters} setFilters={setFilters} />
                 )}
 
             </div>

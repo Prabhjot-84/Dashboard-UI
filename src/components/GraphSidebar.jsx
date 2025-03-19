@@ -21,11 +21,9 @@ const GraphSidebar = ({ isDragging, setIsDragging, setSelectedGraph }) => {
         e.dataTransfer.setData("graphType", graphName);
         setSelectedGraph(graphName);
         setIsDragging(true);
-        // document.body.classList.add("dragging");  // Add dragging class
     };
     
     const handleDragEnd = () => {
-        // document.body.classList.remove("dragging");  // Remove dragging class when drag ends
         setIsDragging(false);
     };    
 
