@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { useLocation } from "react-router-dom";
 import {
   Chart as ChartJS,
@@ -25,13 +25,16 @@ ChartJS.register(
   Legend
 );
 
-const ActionSidebar = () => {
+const ActionSidebar = ({ onExport }) => {
   return (
     <div className="bg-white rounded-lg shadow-sm p-6">
       <h2 className="text-lg font-medium text-gray-700 mb-6">What's your next action?</h2>
       
       <div className="space-y-3">
-        <button className="w-full flex items-center gap-3 px-4 py-3 border border-gray-200 rounded-lg text-left hover:bg-gray-50 transition-colors">
+        <button 
+          onClick={onExport}
+          className="w-full flex items-center gap-3 px-4 py-3 border border-gray-200 rounded-lg text-left hover:bg-gray-50 transition-colors"
+        >
           <Download className="text-indigo-600" size={20} />
           <span className="text-indigo-600 font-medium">Export Graph</span>
         </button>
@@ -66,6 +69,7 @@ const ActionSidebar = () => {
 
 const CreateGraph = () => {
   const location = useLocation();
+  const chartRef = useRef(null);
   console.log(location.state);
   const {
     selectedGraph,
@@ -183,6 +187,26 @@ const CreateGraph = () => {
     // Update URL state or props here if needed
   };
 
+  const handleExport = () => {
+    if (chartRef.current) {
+      // Get the chart instance
+      const chartInstance = chartRef.current;
+      
+      // Convert the chart to a base64 image
+      const imageData = chartInstance.toBase64Image('image/png', 1.0);
+      
+      // Create a temporary link element
+      const downloadLink = document.createElement('a');
+      downloadLink.href = imageData;
+      downloadLink.download = `${graphName || 'graph'}.png`;
+      
+      // Trigger the download
+      document.body.appendChild(downloadLink);
+      downloadLink.click();
+      document.body.removeChild(downloadLink);
+    }
+  };
+
   const chartData = {
     labels: graphData.labels,
     datasets: [
@@ -284,9 +308,9 @@ const CreateGraph = () => {
 
             <div className="h-[400px]">
               {graphType === "Line Graph" ? (
-                <Line options={chartOptions} data={chartData} />
+                <Line ref={chartRef} options={chartOptions} data={chartData} />
               ) : (
-                <Bar options={chartOptions} data={chartData} />
+                <Bar ref={chartRef} options={chartOptions} data={chartData} />
               )}
             </div>
 
@@ -295,7 +319,7 @@ const CreateGraph = () => {
             </div>
           </div>
 
-          <ActionSidebar />
+          <ActionSidebar onExport={handleExport} />
         </div>
       </div>
     </div>
