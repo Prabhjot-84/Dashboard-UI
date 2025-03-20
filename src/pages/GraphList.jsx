@@ -34,21 +34,20 @@ const GraphList = () => {
     if (!graphItem) return;
     
     try {
-      // Get the full graph data including all parameters
-      const { selectedGraph, graphName, Xaxis, Yaxis, Xlabel, Ylabel, Zaxis, Zlabel, filters } = graphItem.selectedGraph;
-      
       // Navigate to graph page with state
-      navigate('/graph', { 
+      navigate('/create-graph', { 
         state: { 
-          selectedGraph, 
-          graphName, 
-          Xaxis, 
-          Yaxis, 
-          Xlabel, 
-          Ylabel, 
-          Zaxis, 
-          Zlabel, 
-          filters 
+          selectedGraph: graphItem.selectedGraph, 
+          graphName: graphItem.nameOfGraph,
+          Xaxis: graphItem.xAxis, 
+          Yaxis: graphItem.yAxis, 
+          Xlabel: graphItem.xLabel, 
+          Ylabel: graphItem.yLabel, 
+          Zaxis: graphItem.zAxis, 
+          Zlabel: graphItem.zLabel, 
+          filters: graphItem.filters,
+          graphId: graphItem.id,
+          description: graphItem.description
         } 
       });
     } catch (error) {
@@ -65,7 +64,7 @@ const GraphList = () => {
       title: item.nameOfGraph,
       description: item.description,
       chartType: typeof item.selectedGraph === 'string' ? item.selectedGraph.toLowerCase() : 'bar',
-      chartImagePath: 'BarGraph.png',
+      chartImagePath: item.selectedGraph?.toLowerCase()?.includes('line') ? 'LineGraph.png' : 'BarGraph.png',
       // Store the original item for navigation
       originalItem: item
     };
