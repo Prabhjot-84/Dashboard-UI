@@ -4,7 +4,7 @@ import Pen from '../assets/pen.png';
 import ParameterImg from '../assets/parameter.png';
 import CrossImg from '../assets/cross.png';
 
-const ParaSidebar2 = ({ setIsDragging, graphName, setGraphName, Xaxis, setXAxis, Xlabel, setXlabel, Zaxis, setZAxis, Zlabel, setZlabel }) => {
+const ParaSidebar2 = ({ setIsDragging, selectedGraph, graphName, setGraphName, Xaxis, setXAxis, Xlabel, setXlabel, Zaxis, setZAxis, Zlabel, setZlabel }) => {
     const navigate = useNavigate();
 
     // Handle drag start (store the parameter being dragged)
@@ -104,7 +104,7 @@ const ParaSidebar2 = ({ setIsDragging, graphName, setGraphName, Xaxis, setXAxis,
             {/* Create Graph Button */}
             {Xaxis && (
                 <button 
-                    onClick={() => navigate('/create-graph')} 
+                    onClick={() => navigate('/create-graph', {state: { selectedGraph , graphName, Xaxis, Xlabel }})} 
                     className="flex gap-3 justify-center items-center bg-[#6C5DD3] text-white w-[80%] h-14 mb-6 rounded-lg font-semibold hover:cursor-pointer"
                 >
                     Create Graph
