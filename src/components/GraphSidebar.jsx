@@ -53,10 +53,10 @@ const GraphSidebar = ({ isDragging, setIsDragging, setSelectedGraph }) => {
                             <img src={graph.img} alt={graph.name} />
                         </div>
                         <div className="lg:w-2/3 w-[70%] h-full">
-                            <h1 className="h-1/3 bg-primary rounded-tr-2xl flex items-center px-4 text-white">
+                            <h1 className="h-2/5 bg-white font-bold rounded-tr-2xl flex items-end px-2 text-primary text-lg">
                                 {graph.name}
                             </h1>
-                            <p className="h-2/3 flex items-center md:px-4 px-2 text-[13px]">
+                            <p className="h-3/5 flex items-center md:px-2 px-2 text-[13px]">
                                 Lorem ipsum, dolor sit amet consectetur adipisicing elit.
                             </p>
                         </div>
