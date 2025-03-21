@@ -1,79 +1,29 @@
 import React, { useEffect, useState } from "react";
-import { useLocation } from "react-router-dom";
-import {
-  Chart as ChartJS,
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  BarElement,
-  Title,
-  Tooltip,
-  Legend,
-} from "chart.js";
-import { Line, Bar } from "react-chartjs-2";
+import { Navigate, useLocation } from "react-router-dom";
+import { useNavigate } from 'react-router-dom';
+import { Chart as ChartJS, ArcElement, CategoryScale, LinearScale, PointElement, LineElement, BarElement, Title, Tooltip, Legend, } from "chart.js";
+import { Line, Bar, Pie, Doughnut } from "react-chartjs-2";
 import { Download, Save, Edit, Copy, X } from "lucide-react";
+import RightSideBar from "./RightSideBar";
 
 ChartJS.register(
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  BarElement,
-  Title,
-  Tooltip,
-  Legend
+  CategoryScale, LinearScale, PointElement, LineElement, BarElement, Title, Tooltip, ArcElement, Legend 
 );
 
-const ActionSidebar = () => {
-  return (
-    <div className="bg-white rounded-lg shadow-sm p-6">
-      <h2 className="text-lg font-medium text-gray-700 mb-6">What's your next action?</h2>
-      
-      <div className="space-y-3">
-        <button className="w-full flex items-center gap-3 px-4 py-3 border border-gray-200 rounded-lg text-left hover:bg-gray-50 transition-colors">
-          <Download className="text-indigo-600" size={20} />
-          <span className="text-indigo-600 font-medium">Export Graph</span>
-        </button>
-        
-        <button className="w-full flex items-center gap-3 px-4 py-3 border border-gray-200 rounded-lg text-left hover:bg-gray-50 transition-colors">
-          <Save className="text-indigo-600" size={20} />
-          <span className="text-indigo-600 font-medium">Save Graph</span>
-        </button>
-        
-        <button className="w-full flex items-center gap-3 px-4 py-3 border border-gray-200 rounded-lg text-left hover:bg-gray-50 transition-colors">
-          <Edit className="text-indigo-600" size={20} />
-          <span className="text-indigo-600 font-medium">Edit Graph</span>
-        </button>
-        
-        <button className="w-full flex items-center gap-3 px-4 py-3 border border-gray-200 rounded-lg text-left hover:bg-gray-50 transition-colors">
-          <Copy className="text-indigo-600" size={20} />
-          <span className="text-indigo-600 font-medium">Duplicate Graph</span>
-        </button>
-      </div>
-      
-      <div className="mt-6">
-        <h3 className="text-sm font-medium text-gray-700 mb-2">Description</h3>
-        <textarea 
-          className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-          rows={3}
-          placeholder="Add a description for this graph..."
-        />
-      </div>
-    </div>
-  );
-};
+const CreateGraph = ( {selectedGraph, Xaxis} ) => {
 
-const CreateGraph = () => {
+  const navigate = useNavigate();
   const location = useLocation();
-  console.log(location.state);
+
   const {
-    selectedGraph,
+    // selectedGraph,
     graphName,
-    Xaxis,
+    // Xaxis,
     Yaxis = "count",
+    Zaxis,
     Xlabel,
     Ylabel = "Number of Students",
+    Zlabel,
     filters = [],
   } = location.state || {};
 
@@ -144,10 +94,11 @@ const CreateGraph = () => {
 
     // Apply filters if any
     let filteredData = data;
+
     if (filters.length > 0) {
       filteredData = data.filter((student) =>
-        filters.every((filter) => 
-          Object.values(student).some((value) => 
+        filters.every((filter) =>
+          Object.values(student).some((value) =>
             String(value).toLowerCase().includes(filter.toLowerCase())
           )
         )
@@ -156,6 +107,7 @@ const CreateGraph = () => {
 
     // Count unique occurrences of the selected parameter
     const uniqueValues = {};
+    
     filteredData.forEach(student => {
       const value = student[xAxisField] || "Unknown";
       uniqueValues[value] = (uniqueValues[value] || 0) + 1;
@@ -172,32 +124,41 @@ const CreateGraph = () => {
     });
   };
 
-  useEffect(() => {
-    if (studentData.length > 0) {
-      updateGraphData(studentData);
-    }
-  }, [filters, studentData, xAxisField]);
+  // useEffect(() => {
+  //   if (studentData.length > 0) {
+  //     updateGraphData(studentData);
+  //   }
+  // }, [filters, studentData, xAxisField]);
 
-  const handleRemoveFilter = (filterToRemove) => {
-    const updatedFilters = filters.filter(filter => filter !== filterToRemove);
-    // Update URL state or props here if needed
-  };
+  const backgroundColors = [
+    "#FF6384", "#36A2EB", "#FFCE56", "#4BC0C0", "#9966FF",
+    "#FF9F40", "#FFCD56", "#C9CBCF", "#4D5360", "#F7464A",
+    "#8BC34A", "#D32F2F", "#1976D2", "#FBC02D", "#7B1FA2",
+    "#388E3C", "#FFA000", "#E64A19", "#0288D1", "#C2185B",
+    "#009688", "#673AB7"
+  ];
+  
+  // Ensure the colors array matches the number of data points dynamically
+  const dynamicBackgroundColors = graphData.labels.map((_, index) => 
+    backgroundColors[index % backgroundColors.length]
+  );
 
-  const chartData = {
+
+  const chartData2d = {
     labels: graphData.labels,
     datasets: [
       {
         label: `${Xlabel || Xaxis}`,
         data: graphData.values,
         borderColor: "rgb(99, 102, 241)",
-        backgroundColor: "rgba(99, 102, 241, 0.5)",
+        backgroundColor: dynamicBackgroundColors,
         borderWidth: graphType === "line" ? 2 : 1,
         tension: 0.1,
       },
     ],
   };
 
-  const chartOptions = {
+  const chartOptions2d = {
     responsive: true,
     maintainAspectRatio: false,
     plugins: {
@@ -212,7 +173,7 @@ const CreateGraph = () => {
     },
     scales: {
       x: {
-        title: { 
+        title: {
           display: true, 
           text: Xlabel || Xaxis
         },
@@ -229,6 +190,44 @@ const CreateGraph = () => {
       },
     },
   };
+
+  const chartData = {
+    labels: graphData.labels,
+    datasets: [
+      {
+        label: `${Xaxis}`,
+        data: graphData.values,
+        backgroundColor: dynamicBackgroundColors,
+      },
+    ],
+  };
+
+  const chartOptions = {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: {
+        display: true, // Ensure legend is displayed
+        position: "right", // Positions the legend (top, bottom, left, right)
+        labels: {
+          font: {
+            size: 14, // Adjust font size
+          },
+          color: "#333", // Legend text color
+          padding: 20, // Space between legend items
+        },
+      },
+      tooltip: {
+        callbacks: {
+          label: (context) => {
+            return `${context.label}: ${context.raw}`;
+          },
+        },
+      },
+    },
+  };
+  
+
 
   if (loading) return <div className="min-h-screen flex items-center justify-center">
     <p className="text-gray-600">Loading student data...</p>
@@ -253,41 +252,26 @@ const CreateGraph = () => {
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="lg:col-span-2 bg-white rounded-lg shadow-sm p-6">
-            <div className="flex justify-between items-center mb-4">
-              <div className="flex gap-4">
-              <select
-               className="px-4 py-2 border border-gray-200 rounded-md text-gray-600 focus:outline-none focus:border-indigo-500"
-               value={graphType || "bar"} // Default to bar only if graphType is still null
-               onChange={(e) => setGraphType(e.target.value)}
-              >
-               <option value="Bar Graph">Bar Graph</option>
-               <option value="Line Graph">Line Graph</option>
-              </select>
-              </div>
 
-              <div className="flex gap-2 flex-wrap">
-                {filters.map((filter, index) => (
-                  <div
-                    key={index}
-                    className="flex items-center gap-2 bg-indigo-50 px-3 py-1 rounded-full text-sm text-indigo-600"
-                  >
-                    {filter}
-                    <X 
-                      size={14} 
-                      className="cursor-pointer" 
-                      onClick={() => handleRemoveFilter(filter)} 
-                    />
-                  </div>
-                ))}
-              </div>
+            <div className="flex justify-between items-center mb-4">
+
+              {selectedGraph !== "Pie Graph" && selectedGraph !== "Doughnut Graph" && (
+                <div className='flex gap-4 text-primary text-sm font-medium'>
+                    {filters.map((filter, index) => (
+                        <div key={index} className='flex items-center bg-[#edeaff] p-2 pr-4 rounded-lg'>
+                            {filter}
+                        </div>
+                    ))}
+                </div>
+              )}
+              
             </div>
 
             <div className="h-[400px]">
-              {graphType === "Line Graph" ? (
-                <Line options={chartOptions} data={chartData} />
-              ) : (
-                <Bar options={chartOptions} data={chartData} />
-              )}
+              {graphType === "Line Graph" && <Line options={chartOptions2d} data={chartData2d} />}
+              {graphType === "Bar Graph" && <Bar options={chartOptions2d} data={chartData2d} />}
+              {selectedGraph === "Pie Graph" && <Pie data={chartData} options={chartOptions} />}
+              {selectedGraph === "Doughnut Graph" && <Doughnut data={chartData} options={chartOptions} />}
             </div>
 
             <div className="mt-4 text-sm text-gray-500">
@@ -295,7 +279,7 @@ const CreateGraph = () => {
             </div>
           </div>
 
-          <ActionSidebar />
+          <RightSideBar />
         </div>
       </div>
     </div>

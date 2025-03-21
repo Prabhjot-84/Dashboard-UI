@@ -193,10 +193,10 @@ const ParaSidebar = ({ isDragging, setIsDragging, selectedGraph, graphName, setG
                 
                 {(Xaxis && Yaxis) && (
                     <button className="flex gap-3 justify-center items-center bg-[#6C5DD3] text-white w-[80%] h-14 mb-6 rounded-lg font-semibold hover:cursor-pointer">
-                        <Link to="/create-graph"
+                        <Link to="/create-graph" className='w-full h-full flex items-center justify-center'
                             state={{ selectedGraph , graphName, Xaxis, Yaxis, Xlabel, Ylabel, filters }}
                         >
-                            Create Graph
+                            <div className=''> Create Graph </div>
                         </Link>
                     </button>
                 )}

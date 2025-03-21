@@ -34,7 +34,7 @@ function App() {
         <Route path="/" element={<LandingPage />} />
         <Route path="/select-graph" element={<SelectGraph selectedGraph={selectedGraph} setSelectedGraph={setSelectedGraph} setGraphName={setGraphName} setXAxis={setXAxis} setYAxis={setYAxis} setZAxis={setZAxis} setFilters={setFilters} />} />
         <Route path="/select-parameter" element={<SelectPara selectedGraph={selectedGraph} setSelectedGraph={setSelectedGraph} graphName={graphName} setGraphName={setGraphName} Xaxis={Xaxis} setXAxis={setXAxis} Yaxis={Yaxis} setYAxis={setYAxis} Xlabel={Xlabel} setXlabel={setXlabel} Ylabel={Ylabel} setYlabel={setYlabel} Zaxis={Zaxis} setZAxis={setZAxis} Zlabel={Zlabel} setZlabel={setZlabel} filters={filters} setFilters={setFilters} />} />
-        <Route path="/create-graph" element={<CreateGraph selectedGraph={selectedGraph} setSelectedGraph={setSelectedGraph} graphName={graphName} setGraphName={setGraphName} Xaxis={Xaxis} setXAxis={setXAxis} Yaxis={Yaxis} setYAxis={setYAxis} Xlabel={Xlabel} setXlabel={setXlabel} Ylabel={Ylabel} setYlabel={setYlabel} filters={filters} setFilters={setFilters} />} />
+        <Route path="/create-graph" element={<CreateGraph selectedGraph={selectedGraph} setSelectedGraph={setSelectedGraph} graphName={graphName} setGraphName={setGraphName} Xaxis={Xaxis} setXAxis={setXAxis} Yaxis={Yaxis} setYAxis={setYAxis} Xlabel={Xlabel} setXlabel={setXlabel} Ylabel={Ylabel} setYlabel={setYlabel} Zaxis={Zaxis} Zlabel={Zlabel} filters={filters} setFilters={setFilters} />} />
       </Routes>
 
     </>

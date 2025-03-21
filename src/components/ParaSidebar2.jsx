@@ -4,7 +4,7 @@ import Pen from '../assets/pen.png';
 import ParameterImg from '../assets/parameter.png';
 import CrossImg from '../assets/cross.png';
 
-const ParaSidebar2 = ({ setIsDragging, graphName, setGraphName, Zaxis, setZAxis, Zlabel, setZlabel }) => {
+const ParaSidebar2 = ({ setIsDragging, graphName, setGraphName, Xaxis, setXAxis, Xlabel, setXlabel, Zaxis, setZAxis, Zlabel, setZlabel }) => {
     const navigate = useNavigate();
 
     // Handle drag start (store the parameter being dragged)
@@ -18,7 +18,7 @@ const ParaSidebar2 = ({ setIsDragging, graphName, setGraphName, Zaxis, setZAxis,
     };
 
     const removeZAxis = () => {
-        setZAxis(null);
+        setXAxis(null);
     };
 
     const parameters = [
@@ -61,7 +61,7 @@ const ParaSidebar2 = ({ setIsDragging, graphName, setGraphName, Zaxis, setZAxis,
                     <div>
                         <h1 className='text-gray text-sm mb-2'> Parameters </h1>
                         {parameters
-                            .filter(param => param.name !== Zaxis)
+                            .filter(param => param.name !== Xaxis)
                             .map((param, index) => (
                                 <div
                                     key={index}
@@ -78,15 +78,15 @@ const ParaSidebar2 = ({ setIsDragging, graphName, setGraphName, Zaxis, setZAxis,
                 </div>
 
                 {/* Z-axis Input */}
-                {Zaxis && (
+                {Xaxis && (
                     <div className='flex flex-col justify-start h-52 border-t-2 border-[#e2e8f0] w-full text-gray p-6'>
                         <div className='mb-4'>
                             <h1 className='text-gray text-sm mb-2'> Graph Label </h1>
                             <div className='text-primary border-2 border-[#e2e8f0] flex items-center p-2 rounded-md'>
                                 <input 
                                     type='text' 
-                                    value={Zlabel} 
-                                    onChange={(e) => setZlabel(e.target.value)} 
+                                    value={Xlabel} 
+                                    onChange={(e) => setXlabel(e.target.value)} 
                                     className='w-full outline-none text-primary' 
                                 />
                                 <img 
@@ -102,9 +102,9 @@ const ParaSidebar2 = ({ setIsDragging, graphName, setGraphName, Zaxis, setZAxis,
             </div>
 
             {/* Create Graph Button */}
-            {Zaxis && (
+            {Xaxis && (
                 <button 
-                    onClick={() => navigate('/graph')} 
+                    onClick={() => navigate('/create-graph')} 
                     className="flex gap-3 justify-center items-center bg-[#6C5DD3] text-white w-[80%] h-14 mb-6 rounded-lg font-semibold hover:cursor-pointer"
                 >
                     Create Graph
