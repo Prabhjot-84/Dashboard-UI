@@ -1,35 +1,28 @@
 import React, { useEffect, useState, useRef } from "react";
 import { useLocation, useNavigate ,useParams } from "react-router-dom";
-import {
-  Chart as ChartJS,
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  BarElement,
-  Title,
-  Tooltip,
-  Legend,
-} from "chart.js";
-import { Line, Bar } from "react-chartjs-2";
+
+
+import { Chart as ChartJS, ArcElement, CategoryScale, LinearScale, PointElement, LineElement, BarElement, Title, Tooltip, Legend,} from "chart.js";
+import { Line, Bar, Pie, Doughnut } from "react-chartjs-2";
 import { Download, Save, Edit, Copy, X, ChevronDown } from "lucide-react";
 import jsPDF from "jspdf";
 import { v4 as uuidv4 } from 'uuid'; // Import UUID to generate unique IDs
 import SaveGraphModal from "./SaveGraphModal";
 import Arrow from '../assets/go-back-arrow.png'
+import DeleteGraphModal from "./DeleteGraphModal";
 
-ChartJS.register(
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  BarElement,
-  Title,
-  Tooltip,
-  Legend
-);
+ChartJS.register( CategoryScale, ArcElement, LinearScale, PointElement, LineElement, BarElement, Title, Tooltip, Legend );
 
-const ActionSidebar = ({ onExport, onSave, onEdit, onDuplicate, savedDescription, graphSaved }) => {
+const ActionSidebar = ({ 
+  onExport, 
+  onSave, 
+  onEdit, 
+  onDuplicate, 
+  onDelete, 
+  savedDescription, 
+  graphSaved, 
+  hasUnsavedChanges 
+}) => {
   const [showExportOptions, setShowExportOptions] = useState(false);
 
   const handleExportClick = () => {
@@ -76,13 +69,25 @@ const ActionSidebar = ({ onExport, onSave, onEdit, onDuplicate, savedDescription
           )}
         </div>
         
-        <button 
-          onClick={onSave}
-          className="w-full flex items-center gap-3 px-4 py-3 border border-gray-200 rounded-lg text-left hover:bg-gray-50 transition-colors"
-        >
-          <Save className="text-indigo-600" size={20} />
-          <span className="text-indigo-600 font-medium">Save Graph</span>
-        </button>
+        {(!graphSaved || hasUnsavedChanges) && (
+          <button 
+            onClick={onSave}
+            className="w-full flex items-center gap-3 px-4 py-3 border border-gray-200 rounded-lg text-left hover:bg-gray-50 transition-colors"
+          >
+            <Save className="text-indigo-600" size={20} />
+            <span className="text-indigo-600 font-medium">Save Graph</span>
+          </button>
+        )}
+        
+        {graphSaved && (
+          <button 
+            onClick={onDelete}
+            className="w-full flex items-center gap-3 px-4 py-3 border border-red-200 rounded-lg text-left hover:bg-red-50 transition-colors"
+          >
+            <X className="text-red-600" size={20} />
+            <span className="text-red-600 font-medium">Delete Graph</span>
+          </button>
+        )}
         
         <button 
           onClick={onEdit}
@@ -112,7 +117,6 @@ const ActionSidebar = ({ onExport, onSave, onEdit, onDuplicate, savedDescription
     </div>
   );
 };
-
 const CreateGraph = () => {
   const location = useLocation();
   const navigate = useNavigate();
@@ -133,6 +137,8 @@ const CreateGraph = () => {
     description: initialDescription = "", // Make sure to handle the description
   } = location.state || {};
   // State variables
+
+  console.log()
   const [selectedGraph, setSelectedGraph] = useState(initialSelectedGraph);
   const [graphName, setGraphName] = useState(initialGraphName || "");
   const [Xaxis, setXAxis] = useState(initialXaxis);
@@ -153,6 +159,9 @@ const CreateGraph = () => {
   const [savedDescription, setSavedDescription] = useState(initialDescription || "");
   const [graphId, setGraphId] = useState(initialGraphId || null);
   const [isDuplicating, setIsDuplicating] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+  const [initialState, setInitialState] = useState({});
 
 
   useEffect(() => {
@@ -197,6 +206,70 @@ const CreateGraph = () => {
     }
   }, [selectedGraph]);
 
+  useEffect(() => {
+    if (graphSaved) {
+      const currentState = {
+        selectedGraph,
+        graphName,
+        Xaxis,
+        Yaxis,
+        Xlabel,
+        Ylabel,
+        Zaxis,
+        Zlabel,
+        filters,
+        description: savedDescription,
+      };
+      
+      // Check if any property is different
+      const hasChanges = Object.keys(initialState).some(key => {
+        if (key === 'filters') {
+          // Special handling for array comparison
+          return JSON.stringify(initialState[key]) !== JSON.stringify(currentState[key]);
+        }
+        return initialState[key] !== currentState[key];
+      });
+      
+      setHasUnsavedChanges(hasChanges);
+    }
+  }, [selectedGraph, graphName, Xaxis, Yaxis, Xlabel, Ylabel, Zaxis, Zlabel, filters, savedDescription]);
+  
+  // Add the delete handler
+  const handleDeleteClick = () => {
+    setShowDeleteModal(true);
+  };
+  const handleDeleteConfirm = () => {
+    if (!graphId) return;
+    
+    try {
+      // Get existing graphs from localStorage
+      const existingData = localStorage.getItem('GraphData');
+      
+      if (existingData) {
+        // Parse the stored data
+        const parsedData = JSON.parse(existingData);
+        
+        // Handle both array and object formats
+        if (Array.isArray(parsedData)) {
+          // Filter out the graph to delete
+          const updatedGraphs = parsedData.filter(graph => graph.id !== graphId);
+          
+          // Save the updated array back to localStorage
+          localStorage.setItem('GraphData', JSON.stringify(updatedGraphs));
+        } else if (parsedData.id === graphId) {
+          // If the only graph is being deleted, remove the item completely
+          localStorage.removeItem('GraphData');
+        }
+        
+        // Navigate back to the graph list
+        navigate('/graph-list');
+      }
+    } catch (error) {
+      console.error('Error deleting graph:', error);
+    } finally {
+      setShowDeleteModal(false);
+    }
+  };
   // Parameter mapping from ParaSidebar to data fields
   const parameterMapping = {
     "State": "state",
@@ -279,7 +352,7 @@ const CreateGraph = () => {
 
     fetchStudentData();
   }, [xAxisField]);
-
+// console.log(graphType)
   const updateGraphData = (data) => {
     if (!data.length) return;
 
@@ -323,51 +396,59 @@ const CreateGraph = () => {
     const updatedFilters = filters.filter(filter => filter !== filterToRemove);
     setFilters(updatedFilters);
   };
-
   const handleExport = (format) => {
     if (chartRef.current) {
-      // Get the chart instance
-      const chartInstance = chartRef.current;
-      
-      if (format === 'png') {
-        // Convert the chart to a base64 image
-        const imageData = chartInstance.toBase64Image('image/png', 1.0);
+      try {
+        // Get the chart instance
+        const chartInstance = chartRef.current;
         
-        // Create a temporary link element
-        const downloadLink = document.createElement('a');
-        downloadLink.href = imageData;
-        downloadLink.download = `${graphName || 'graph'}.png`;
-        
-        // Trigger the download
-        document.body.appendChild(downloadLink);
-        downloadLink.click();
-        document.body.removeChild(downloadLink);
-      } else if (format === 'pdf') {
-        // Create a new PDF document
-        const pdf = new jsPDF('landscape', 'mm', 'a4');
-        
-        // Add title to PDF
-        const title = graphName || `Distribution of ${Xaxis}`;
-        pdf.setFontSize(16);
-        pdf.text(title, 20, 20);
-        
-        // Convert the chart to a base64 image
-        const imageData = chartInstance.toBase64Image('image/png', 1.0);
-        
-        // Add the image to the PDF
-        pdf.addImage(imageData, 'PNG', 20, 30, 250, 150);
-        
-        // Add metadata
-        pdf.setFontSize(10);
-        pdf.text(`Generated on: ${new Date().toLocaleDateString()}`, 20, 190);
-        pdf.text(`Showing ${graphData.labels.length} unique ${Xaxis} values`, 20, 195);
-        
-        // Save the PDF
-        pdf.save(`${graphName || 'graph'}.pdf`);
+        if (format === 'png') {
+          // Convert the chart to a base64 image
+          const imageData = chartInstance.toBase64Image('image/png', 1.0);
+          
+          // Create a temporary link element
+          const downloadLink = document.createElement('a');
+          downloadLink.href = imageData;
+          downloadLink.download = `${graphName || 'graph'}.png`;
+          
+          // Trigger the download
+          document.body.appendChild(downloadLink);
+          downloadLink.click();
+          document.body.removeChild(downloadLink);
+          console.log('PNG export completed');
+        } else if (format === 'pdf') {
+          // Create a new PDF document
+          const pdf = new jsPDF('landscape', 'mm', 'a4');
+          
+          // Add title to PDF
+          const title = graphName || `Distribution of ${Xaxis}`;
+          pdf.setFontSize(16);
+          pdf.text(title, 20, 20);
+          
+          // Convert the chart to a base64 image
+          const imageData = chartInstance.toBase64Image('image/png', 1.0);
+          
+          // Add the image to the PDF
+          pdf.addImage(imageData, 'PNG', 20, 30, 250, 150);
+          
+          // Add metadata
+          pdf.setFontSize(10);
+          pdf.text(`Generated on: ${new Date().toLocaleDateString()}`, 20, 190);
+          pdf.text(`Showing ${graphData.labels.length} unique ${Xaxis} values`, 20, 195);
+          
+          // Save the PDF
+          pdf.save(`${graphName || 'graph'}.pdf`);
+          console.log('PDF export completed');
+        }
+      } catch (error) {
+        console.error('Error exporting chart:', error);
+        alert('Failed to export chart. Please try again.');
       }
+    } else {
+      console.error('Chart reference is not available');
+      alert('Chart reference is not available. Please try again.');
     }
   };
-
   const handleSaveClick = () => {
     setShowSaveModal(true);
   };
@@ -612,11 +693,37 @@ const CreateGraph = () => {
 
 
   
-// Add legends to the graph - modify the chartOptions object around line 597
-const chartOptions = {
-  responsive: true,
-  maintainAspectRatio: false,
-  plugins: {
+  const backgroundColors = [
+    "#FF6384", "#36A2EB", "#FFCE56", "#4BC0C0", "#9966FF",
+    "#FF9F40", "#FFCD56", "#C9CBCF", "#4D5360", "#F7464A",
+    "#8BC34A", "#D32F2F", "#1976D2", "#FBC02D", "#7B1FA2",
+    "#388E3C", "#FFA000", "#E64A19", "#0288D1", "#C2185B",
+    "#009688", "#673AB7"
+  ];
+  
+  // Ensure the colors array matches the number of data points dynamically
+  const dynamicBackgroundColors = graphData.labels.map((_, index) => 
+    backgroundColors[index % backgroundColors.length]
+  );
+
+  const chartData2d = {
+    labels: graphData.labels,
+    datasets: [
+      {
+        label: `${Xlabel || Xaxis}`,
+        data: graphData.values,
+        borderColor: "rgb(99, 102, 241)",
+        backgroundColor: dynamicBackgroundColors,
+        borderWidth: graphType === "line" ? 2 : 1,
+        tension: 0.1,
+      },
+    ],
+  };
+
+  const chartOptions2d = {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
     legend: { 
       display: true,
       position: 'top',
@@ -626,48 +733,71 @@ const chartOptions = {
         padding: 20
       }
     },
-    tooltip: {
-      callbacks: {
-        label: (context) => {
-          return `Count: ${context.parsed.y}`;
+      tooltip: {
+        callbacks: {
+          label: (context) => {
+            return `Count: ${context.parsed.y}`;
+          }
         }
       }
-    }
-  },
-  scales: {
-    x: {
-      title: { 
-        display: true, 
-        text: Xlabel || Xaxis
+    },
+    scales: {
+      x: {
+        title: {
+          display: true, 
+          text: Xlabel || Xaxis
+        },
+        grid: {
+          display: false
+        }
       },
-      grid: {
-        display: false
-      }
+      y: {
+        title: { display: true, text: Ylabel },
+        beginAtZero: true,
+        ticks: {
+          precision: 0
+        }
+      },
     },
-    y: {
-      title: { display: true, text: Ylabel },
-      beginAtZero: true,
-      ticks: {
-        precision: 0
-      }
-    },
-  },
-};
+  };
 
-// Also update the chartData structure to make the dataset label more descriptive:
-const chartData = {
-  labels: graphData.labels,
-  datasets: [
-    {
-      label: `${Ylabel || 'Count'} by ${Xlabel || Xaxis}`,
-      data: graphData.values,
-      borderColor: "rgb(99, 102, 241)",
-      backgroundColor: "rgba(99, 102, 241, 0.5)",
-      borderWidth: graphType === "Line Graph" ? 2 : 1,
-      tension: 0.1,
+  const chartData1d = {
+    labels: graphData.labels,
+    datasets: [
+      {
+        label: `${Xaxis}`,
+        data: graphData.values,
+        backgroundColor: dynamicBackgroundColors,
+      },
+    ],
+  };
+
+  const chartOptions1d = {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: {
+        display: true, // Ensure legend is displayed
+        position: "right", // Positions the legend (top, bottom, left, right)
+        labels: {
+          font: {
+            size: 14, // Adjust font size
+          },
+          color: "#333", // Legend text color
+          padding: 20, // Space between legend items
+        },
+      },
+      tooltip: {
+        callbacks: {
+          label: (context) => {
+            return `${context.label}: ${context.raw}`;
+          },
+        },
+      },
     },
-  ],
-};
+  };
+  
+
 
   if (loading) return <div className="min-h-screen flex items-center justify-center">
     <p className="text-gray-600">Loading student data...</p>
@@ -734,12 +864,11 @@ const chartData = {
             </div>
 
             <div className="h-[400px]">
-              {(graphType === "Line Graph" || selectedGraph === "Line Graph") ? (
-                <Line ref={chartRef} options={chartOptions} data={chartData} />
-              ) : (
-                <Bar ref={chartRef} options={chartOptions} data={chartData} />
-              )}
-            </div>
+  {graphType === "Line Graph" && <Line ref={chartRef} options={chartOptions2d} data={chartData2d} />}
+  {graphType === "Bar Graph" && <Bar ref={chartRef} options={chartOptions2d} data={chartData2d} />}
+  {selectedGraph === "Pie Graph" && <Pie ref={chartRef} data={chartData1d} options={chartOptions1d} />}
+  {selectedGraph === "Doughnut Graph" && <Doughnut ref={chartRef} data={chartData1d} options={chartOptions1d} />}
+</div>
 
             <div className="mt-4 text-sm text-gray-500">
               {`Showing ${graphData.labels.length} unique ${Xaxis} values`}
@@ -751,8 +880,10 @@ const chartData = {
             onSave={handleSaveClick}
             onEdit={handleEditClick}
             onDuplicate={handleDuplicateClick}
+            onDelete={handleDeleteClick}
             savedDescription={savedDescription}
             graphSaved={graphSaved}
+            hasUnsavedChanges={hasUnsavedChanges}
           />
         </div>
       </div>
@@ -771,6 +902,12 @@ const chartData = {
         yAxis={Yaxis}
         filterCount={filters.length}
         description={isDuplicating ? "" : savedDescription} // Don't show description if duplicating
+      />
+        <DeleteGraphModal
+        isOpen={showDeleteModal}
+        onClose={() => setShowDeleteModal(false)}
+        onDelete={handleDeleteConfirm}
+        graphTitle={graphName || `Distribution of ${Xaxis}`}
       />
     </div>
   );

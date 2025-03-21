@@ -52,7 +52,7 @@ const SelectPara = ( {selectedGraph, setSelectedGraph, graphName, setGraphName, 
         e.preventDefault();
         setIsDragging(false);
         const droppedParam = e.dataTransfer.getData("parameter");
-        setZAxis(droppedParam);
+        setXAxis(droppedParam);
     }
 
     const handleDragOver = (e) => {
@@ -172,7 +172,7 @@ const SelectPara = ( {selectedGraph, setSelectedGraph, graphName, setGraphName, 
                                     <div className={`${isDragging ? "bg-[#eef1ff]" : "bg-white"} w-full h-full flex flex-col items-center justify-center outline-3 ${isDragging ? "outline-[#eef1ff]" : "outline-white"} rounded-xs p-2`}>
                                         <h1 className='text-xl font-semibold text-gray'> Your {selectedGraph} will appear here </h1>
                                         <br />
-                                        <span className='text-primary text-base'> {Zaxis ? `${Zlabel}` : "Drag and Drop your parameter here"} </span>
+                                        <span className='text-primary text-base'> {Xaxis ? `${Xlabel}` : "Drag and Drop your parameter here"} </span>
                                     </div>
                                 </div>
                             </div>
@@ -190,7 +190,7 @@ const SelectPara = ( {selectedGraph, setSelectedGraph, graphName, setGraphName, 
                 )}
 
                 {(selectedGraph === "Pie Graph" || selectedGraph === "Doughnut Graph") && (
-                    <ParaSidebar2 setIsDragging={setIsDragging} selectedGraph={selectedGraph} graphName={graphName} setGraphName={setGraphName} Zaxis={Zaxis} setZAxis={setZAxis} Zlabel={Zlabel} setZlabel={setZlabel} filters={filters} setFilters={setFilters} />
+                    <ParaSidebar2 setIsDragging={setIsDragging} selectedGraph={selectedGraph} graphName={graphName} setGraphName={setGraphName} Xaxis={Xaxis} setXAxis={setXAxis} setXlabel={setXlabel} Xlabel={Xlabel} Zaxis={Zaxis} setZAxis={setZAxis} Zlabel={Zlabel} setZlabel={setZlabel} filters={filters} setFilters={setFilters} />
                 )}
 
             </div>
