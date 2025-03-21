@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate ,useParams } from "react-router-dom";
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -116,6 +116,7 @@ const ActionSidebar = ({ onExport, onSave, onEdit, onDuplicate, savedDescription
 const CreateGraph = () => {
   const location = useLocation();
   const navigate = useNavigate();
+  const { graphId: urlGraphId } = useParams();
   const chartRef = useRef(null);
   
   const {
@@ -153,6 +154,43 @@ const CreateGraph = () => {
   const [graphId, setGraphId] = useState(initialGraphId || null);
   const [isDuplicating, setIsDuplicating] = useState(false);
 
+
+  useEffect(() => {
+    if (urlGraphId && !location.state) {
+      // If we have a graphId in the URL but no state, we need to load from localStorage
+      const existingData = localStorage.getItem('GraphData');
+      if (existingData) {
+        try {
+          const parsedData = JSON.parse(existingData);
+          const graphData = Array.isArray(parsedData) 
+            ? parsedData.find(graph => graph.id === urlGraphId)
+            : parsedData.id === urlGraphId ? parsedData : null;
+            
+          if (graphData) {
+            // Navigate to the same URL but with state this time
+            navigate(`/edit-graph/${urlGraphId}`, { 
+              state: { 
+                selectedGraph: graphData.selectedGraph, 
+                graphName: graphData.nameOfGraph,
+                Xaxis: graphData.xAxis, 
+                Yaxis: graphData.yAxis, 
+                Xlabel: graphData.xLabel, 
+                Ylabel: graphData.yLabel, 
+                Zaxis: graphData.zAxis, 
+                Zlabel: graphData.zLabel, 
+                filters: graphData.filters,
+                graphId: graphData.id,
+                description: graphData.description
+              },
+              replace: true // Replace the current entry in the history stack
+            });
+          }
+        } catch (error) {
+          console.error('Error parsing graph data from localStorage:', error);
+        }
+      }
+    }
+  }, [urlGraphId, location.state, navigate]);
   useEffect(() => {
     if (selectedGraph) {
       setGraphType(selectedGraph);
@@ -423,37 +461,17 @@ const CreateGraph = () => {
   //   // Reset duplicating flag
   //   setIsDuplicating(false);
   // };
-  const handleDuplicateClick = () => {
-    // Set duplicating flag to create a new graph
-    setIsDuplicating(true);
-    // Clear graphId and savedDescription to make it a new graph
-    setGraphId(null);
-    setGraphSaved(false);
-    setSavedDescription("");
-    // Show save modal to confirm
-    setShowSaveModal(true);
-  };
 
-  const handleGoBack = () => {
-    // Check if there are unsaved changes or important parameters selected
-    if (graphName || Xaxis || Yaxis || Zaxis || filters.length > 0) {
-      const confirmNavigation = window.confirm(
-        "Are you sure you want to go back? Any unsaved progress will be lost. Please save your graph first if you want to keep it."
-      );
-      if (confirmNavigation) {
-        navigate('/graph-list'); // Navigate to graph list or appropriate page
-      }
-    } else {
-      navigate('/graph-list'); // No changes to save, just go back
-    }
-  };
-  
+  // Finally, modify the handleSaveGraph function to handle the title correctly
   const handleSaveGraph = ({ graphName, description }) => {
     // Create a new ID if it's a new graph or being duplicated
     const newId = graphId && !isDuplicating ? graphId : uuidv4();
     
     // Update state with the new values
-    setGraphName(graphName);
+    const displayName = isDuplicating ? `${graphName} (COPY)` : graphName;
+    const savedName = graphName;
+    
+    setGraphName(displayName);
     setSavedDescription(description);
     setGraphSaved(true);
     setGraphId(newId);
@@ -461,7 +479,7 @@ const CreateGraph = () => {
     // Create the graph object to save
     const graphToSave = {
       id: newId,
-      nameOfGraph: graphName,
+      nameOfGraph: savedName,
       description: description,
       selectedGraph: graphType || selectedGraph || "Bar Graph",
       xAxis: Xaxis,
@@ -474,7 +492,7 @@ const CreateGraph = () => {
       createdAt: new Date().toISOString(),
       lastModified: new Date().toISOString(),
     };
-  
+
     // Get existing graphs from localStorage
     const existingData = localStorage.getItem('GraphData');
     let graphsArray = [];
@@ -500,19 +518,19 @@ const CreateGraph = () => {
       // First graph being saved
       graphsArray = [graphToSave];
     }
-  
+
     // Save to localStorage
     localStorage.setItem('GraphData', JSON.stringify(graphsArray));
     
     // Reset duplicating flag
     setIsDuplicating(false);
     
-    // If we were duplicating, navigate to select-parameter with the new graph data
+    // If we were duplicating, navigate to the parameter page with the new graph data
     if (isDuplicating) {
       navigate('/select-parameter', {
         state: {
           selectedGraph,
-          graphName,
+          graphName: savedName,
           Xaxis, 
           Yaxis,
           Xlabel,
@@ -520,58 +538,136 @@ const CreateGraph = () => {
           Zaxis,
           Zlabel,
           filters,
-          graphId: newId, // Pass the new graph ID
-          savedDescription: description, // Pass the new description
+          graphId: newId,
+          savedDescription: description,
         }
+      });
+    } else if (!graphId) {
+      // If it was a new graph (not duplicating and no previous ID), update the URL
+      navigate(`/edit-graph/${newId}`, { 
+        state: location.state, 
+        replace: true 
       });
     }
   };
-  const chartData = {
-    labels: graphData.labels,
-    datasets: [
-      {
-        label: `${Xlabel || Xaxis}`,
-        data: graphData.values,
-        borderColor: "rgb(99, 102, 241)",
-        backgroundColor: "rgba(99, 102, 241, 0.5)",
-        borderWidth: graphType === "Line Graph" ? 2 : 1,
-        tension: 0.1,
-      },
-    ],
+
+  const handleDuplicateClick = () => {
+    // Set duplicating flag to create a new graph
+    setIsDuplicating(true);
+    
+    // Clear graphId to make it a new graph
+    setGraphId(null);
+    setGraphSaved(false);
+    
+    // Immediately update the graph name to show (COPY) in the UI
+    const duplicatedName = `${graphName || `Distribution of ${Xaxis}`} (COPY)`;
+    setGraphName(duplicatedName);
+    
+    // Clear the description for the new copy
+    setSavedDescription("");
+    
+    // Show save modal to confirm
+    setShowSaveModal(true);
+  };
+  
+  // Then modify the SaveGraphModal component to pre-populate with the original name (without COPY)
+  // Update the graphTitle prop in the SaveGraphModal component call
+  <SaveGraphModal 
+    isOpen={showSaveModal}
+    onClose={() => {
+      setShowSaveModal(false);
+      
+      // Reset the title if the user cancels the duplicate operation
+      if (isDuplicating) {
+        // If user cancels, revert to the original title
+        const originalTitle = graphName.replace(" (COPY)", "");
+        setGraphName(originalTitle);
+        setIsDuplicating(false);
+      }
+    }}
+    onSave={handleSaveGraph}
+    // Remove the (COPY) part when showing in the save modal
+    graphTitle={isDuplicating ? graphName.replace(" (COPY)", "") : graphName || `Distribution of ${Xaxis}`}
+    graphType={graphType || selectedGraph || "Bar Graph"}
+    xAxis={Xaxis}
+    yAxis={Yaxis}
+    filterCount={filters.length}
+    description={isDuplicating ? "" : savedDescription} // Don't show description if duplicating
+  />
+
+  const handleGoBack = () => {
+    // Check if there are unsaved changes or important parameters selected
+    if (graphName || Xaxis || Yaxis || Zaxis || filters.length > 0) {
+      const confirmNavigation = window.confirm(
+        "Are you sure you want to go back? Any unsaved progress will be lost. Please save your graph first if you want to keep it."
+      );
+      if (confirmNavigation) {
+        navigate('/graph-list'); // Navigate to graph list or appropriate page
+      }
+    } else {
+      navigate('/graph-list'); // No changes to save, just go back
+    }
   };
 
-  const chartOptions = {
-    responsive: true,
-    maintainAspectRatio: false,
-    plugins: {
-      legend: { display: false },
-      tooltip: {
-        callbacks: {
-          label: (context) => {
-            return `Count: ${context.parsed.y}`;
-          }
-        }
+
+
+  
+// Add legends to the graph - modify the chartOptions object around line 597
+const chartOptions = {
+  responsive: true,
+  maintainAspectRatio: false,
+  plugins: {
+    legend: { 
+      display: true,
+      position: 'top',
+      labels: {
+        boxWidth: 20,
+        usePointStyle: true,
+        padding: 20
       }
     },
-    scales: {
-      x: {
-        title: { 
-          display: true, 
-          text: Xlabel || Xaxis
-        },
-        grid: {
-          display: false
+    tooltip: {
+      callbacks: {
+        label: (context) => {
+          return `Count: ${context.parsed.y}`;
         }
+      }
+    }
+  },
+  scales: {
+    x: {
+      title: { 
+        display: true, 
+        text: Xlabel || Xaxis
       },
-      y: {
-        title: { display: true, text: Ylabel },
-        beginAtZero: true,
-        ticks: {
-          precision: 0
-        }
-      },
+      grid: {
+        display: false
+      }
     },
-  };
+    y: {
+      title: { display: true, text: Ylabel },
+      beginAtZero: true,
+      ticks: {
+        precision: 0
+      }
+    },
+  },
+};
+
+// Also update the chartData structure to make the dataset label more descriptive:
+const chartData = {
+  labels: graphData.labels,
+  datasets: [
+    {
+      label: `${Ylabel || 'Count'} by ${Xlabel || Xaxis}`,
+      data: graphData.values,
+      borderColor: "rgb(99, 102, 241)",
+      backgroundColor: "rgba(99, 102, 241, 0.5)",
+      borderWidth: graphType === "Line Graph" ? 2 : 1,
+      tension: 0.1,
+    },
+  ],
+};
 
   if (loading) return <div className="min-h-screen flex items-center justify-center">
     <p className="text-gray-600">Loading student data...</p>
@@ -669,7 +765,7 @@ const CreateGraph = () => {
           setIsDuplicating(false); // Reset duplicating flag if modal is closed
         }}
         onSave={handleSaveGraph}
-        graphTitle={isDuplicating ? `${graphName} (Copy)` : graphName || `Distribution of ${Xaxis}`}
+        graphTitle={isDuplicating ? `${graphName}` : graphName || `Distribution of ${Xaxis}`}
         graphType={graphType || selectedGraph || "Bar Graph"}
         xAxis={Xaxis}
         yAxis={Yaxis}

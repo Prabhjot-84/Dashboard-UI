@@ -34,8 +34,8 @@ const GraphList = () => {
     if (!graphItem) return;
     
     try {
-      // Navigate to graph page with state
-      navigate('/create-graph', { 
+      // Navigate to the dynamic route with the graph ID in the URL
+      navigate(`/edit-graph/${graphItem.id}`, { 
         state: { 
           selectedGraph: graphItem.selectedGraph, 
           graphName: graphItem.nameOfGraph,
@@ -55,7 +55,8 @@ const GraphList = () => {
     }
   };
 
-  // If no graph data is found in local storage, use sample data
+  // Rest of your component remains the same
+  
   const sampleCardData = graphData.length > 0 ? graphData.map(item => {
     if (!item) return null;
     
